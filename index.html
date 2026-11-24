@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fliperama da Matemática</title>
+  <link rel="stylesheet" href="estilo-comum.css">
+  <style>
+    /* ===== Estilo só da página inicial ===== */
+
+    .inicio {
+      max-width: var(--largura-max);
+      margin: 0 auto;
+      padding: 2.5rem var(--espaco) 1rem;
+    }
+
+    .inicio__dica {
+      margin: 0 0 1.75rem;
+      font-size: 1.15rem;
+      color: var(--texto-claro-suave);
+    }
+
+    .inicio__dica strong {
+      color: var(--texto-claro);
+    }
+
+    /* A quadra: um "campo" para cada grupo */
+    .zonas {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+      gap: 1.5rem;
+    }
+
+    .zona {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      padding: 1.4rem 1.25rem 1.25rem;
+      background: var(--azul-garrafao);
+      /* linha fina pintada, sempre visível */
+      box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.28), var(--sombra);
+    }
+
+    /* Movimento especial: a linha da quadra se desenha em volta do cartão.
+       Uma metade desenha em cima e à direita; a outra, embaixo e à esquerda. */
+    .zona::before,
+    .zona::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      pointer-events: none;
+    }
+
+    .zona::before { top: 0; left: 0; }
+    .zona::after { bottom: 0; right: 0; }
+
+    .zona:hover::before,
+    .zona:focus-within::before {
+      width: 100%;
+      height: 100%;
+      border-top-color: var(--cor-linha);
+      border-right-color: var(--cor-linha);
+      transition: width 200ms ease-out, height 200ms ease-out 200ms;
+    }
+
+    .zona:hover::after,
+    .zona:focus-within::after {
+      width: 100%;
+      height: 100%;
+      border-bottom-color: var(--cor-linha);
+      border-left-color: var(--cor-linha);
+      transition: border-color 0s 400ms, width 200ms ease-out 400ms, height 200ms ease-out 600ms;
+    }
+
+    .zona__camisa {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.6rem;
+    }
+
+    .zona__palavra {
+      font-weight: 800;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cor-linha);
+      padding-bottom: 0.2rem;
+    }
+
+    .zona__titulo {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .zona__info {
+      margin: 0;
+      display: grid;
+      gap: 0.25rem;
+      color: var(--texto-claro-suave);
+    }
+
+    .zona__info dt {
+      display: inline;
+      font-weight: 700;
+      color: var(--texto-claro);
+    }
+
+    .zona__info dd {
+      display: inline;
+      margin: 0;
+    }
+
+    .zona__botao {
+      margin-top: auto;
+      width: 100%;
+    }
+
+    @media (max-width: 30rem) {
+      .numero { height: 4.5rem; }
+    }
+  </style>
+</head>
+<body class="fundo-quadra">
+  <!-- Desenho dos algarismos (usados nos números de camisa) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="d0" viewBox="0 0 60 100"><path d="M8 8 H52 V92 H8 Z"/></symbol>
+    <symbol id="d1" viewBox="0 0 60 100"><path d="M14 22 L30 8 V92"/></symbol>
+    <symbol id="d2" viewBox="0 0 60 100"><path d="M8 8 H52 V50 H8 V92 H52"/></symbol>
+    <symbol id="d3" viewBox="0 0 60 100"><path d="M8 8 H52 V92 H8 M20 50 H52"/></symbol>
+    <symbol id="d4" viewBox="0 0 60 100"><path d="M8 8 V56 H52 M44 8 V92"/></symbol>
+    <symbol id="d5" viewBox="0 0 60 100"><path d="M52 8 H8 V50 H52 V92 H8"/></symbol>
+    <symbol id="d6" viewBox="0 0 60 100"><path d="M52 8 H8 V92 H52 V50 H8"/></symbol>
+    <symbol id="d7" viewBox="0 0 60 100"><path d="M8 8 H52 V92"/></symbol>
+    <symbol id="d8" viewBox="0 0 60 100"><path d="M8 8 H52 V92 H8 Z M8 50 H52"/></symbol>
+    <symbol id="d9" viewBox="0 0 60 100"><path d="M52 50 H8 V8 H52 V92 H8"/></symbol>
+  </svg>
+
+  <header class="cabecalho cabecalho--inicio">
+    <div class="cabecalho__dentro">
+      <h1 class="cabecalho__titulo">Fliperama da <span>Matemática</span></h1>
+      <p class="cabecalho__descricao">Os joguinhos de matemática criados pela turma, um pedido de cada vez.</p>
+    </div>
+  </header>
+
+  <main class="inicio">
+    <p class="inicio__dica">Cada número é um grupo. <strong>Encontre o seu e aperte Jogar!</strong></p>
+
+    <!--
+      Os cartões abaixo vêm do arquivo grupos.md (preenchido pela professora).
+      Enquanto o grupo não tem jogo, o cartão mostra "Jogo em construção".
+    -->
+    <ol class="zonas">
+      <!-- Grupo 1 -->
+      <li class="zona" style="--cor-linha: var(--amarelo)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 1"><use href="#d0" x="0" width="60" height="100"/><use href="#d1" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-01/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 1</span></a>
+      </li>
+      <!-- Grupo 2 -->
+      <li class="zona" style="--cor-linha: var(--branco)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 2"><use href="#d0" x="0" width="60" height="100"/><use href="#d2" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-02/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 2</span></a>
+      </li>
+      <!-- Grupo 3 -->
+      <li class="zona" style="--cor-linha: var(--verde)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 3"><use href="#d0" x="0" width="60" height="100"/><use href="#d3" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-03/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 3</span></a>
+      </li>
+      <!-- Grupo 4 -->
+      <li class="zona" style="--cor-linha: var(--vermelho)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 4"><use href="#d0" x="0" width="60" height="100"/><use href="#d4" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-04/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 4</span></a>
+      </li>
+      <!-- Grupo 5 -->
+      <li class="zona" style="--cor-linha: var(--amarelo)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 5"><use href="#d0" x="0" width="60" height="100"/><use href="#d5" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-05/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 5</span></a>
+      </li>
+      <!-- Grupo 6 -->
+      <li class="zona" style="--cor-linha: var(--branco)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 6"><use href="#d0" x="0" width="60" height="100"/><use href="#d6" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-06/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 6</span></a>
+      </li>
+      <!-- Grupo 7 -->
+      <li class="zona" style="--cor-linha: var(--verde)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 7"><use href="#d0" x="0" width="60" height="100"/><use href="#d7" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-07/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 7</span></a>
+      </li>
+      <!-- Grupo 8 -->
+      <li class="zona" style="--cor-linha: var(--vermelho)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 8"><use href="#d0" x="0" width="60" height="100"/><use href="#d8" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-08/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 8</span></a>
+      </li>
+      <!-- Grupo 9 -->
+      <li class="zona" style="--cor-linha: var(--amarelo)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 9"><use href="#d0" x="0" width="60" height="100"/><use href="#d9" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-09/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 9</span></a>
+      </li>
+      <!-- Grupo 10 -->
+      <li class="zona" style="--cor-linha: var(--branco)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 10"><use href="#d1" x="0" width="60" height="100"/><use href="#d0" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h2 class="zona__titulo">Jogo em construção</h2>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-10/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 10</span></a>
+      </li>
+    </ol>
+  </main>
+
+  <footer class="rodape">
+    <p>Fliperama da Matemática · Funciona sem internet e não guarda nenhum dado de quem joga.</p>
+  </footer>
+</body>
+</html>

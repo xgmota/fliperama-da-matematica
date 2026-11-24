@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grupo 9 · Fliperama da Matemática</title>
+  <!-- Visual comum a todos os jogos (cores, cabeçalho e botões) -->
+  <link rel="stylesheet" href="../../estilo-comum.css">
+  <style>
+    /* ===== Estilo só deste jogo (Grupo 9) ===== */
+
+    .em-construcao {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .em-construcao__texto {
+      display: grid;
+      gap: 1rem;
+      max-width: 36rem;
+    }
+
+    .em-construcao h2 {
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .em-construcao p {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .em-construcao .botao {
+      justify-self: start;
+    }
+
+    /* Número do grupo pintado no chão */
+    .em-construcao .numero {
+      --cor-linha: var(--azul-garrafao);
+      height: clamp(7rem, 22vw, 13rem);
+    }
+
+    /* Faixa listrada de "obra" pintada na quadra */
+    .faixa-obra {
+      height: 1.5rem;
+      margin: 0 0 2rem;
+      border-radius: 4px;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--amarelo) 0 22px,
+        var(--azul-noite) 22px 44px
+      );
+    }
+
+    @media (max-width: 40rem) {
+      .em-construcao {
+        grid-template-columns: 1fr;
+      }
+      .em-construcao .numero {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Desenho dos algarismos (usados nos números de camisa) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="d0" viewBox="0 0 60 100"><path d="M8 8 H52 V92 H8 Z"/></symbol>
+    <symbol id="d9" viewBox="0 0 60 100"><path d="M52 50 H8 V8 H52 V92 H8"/></symbol>
+  </svg>
+
+  <!-- Cabeçalho igual em todos os jogos -->
+  <header class="cabecalho">
+    <div class="cabecalho__dentro">
+      <a class="botao botao--voltar" href="../../index.html">← Voltar ao início</a>
+      <h1 class="cabecalho__titulo">Jogo em construção</h1>
+      <p class="cabecalho__grupo">Feito pelo <strong>Grupo 9</strong></p>
+    </div>
+  </header>
+
+  <main class="pagina-jogo">
+    <!-- Área do jogo: quando o grupo mandar o primeiro pedido, o jogo entra aqui -->
+    <section class="area-jogo" aria-labelledby="aviso">
+      <div class="faixa-obra" aria-hidden="true"></div>
+      <div class="em-construcao">
+        <div class="em-construcao__texto">
+          <h2 id="aviso">Este jogo ainda está em construção</h2>
+          <p>O Grupo 9 está treinando as jogadas. Logo, logo o jogo aparece aqui!</p>
+          <p>Enquanto isso, que tal jogar o jogo de outro grupo?</p>
+          <a class="botao" href="../../index.html">Ver os outros jogos</a>
+        </div>
+        <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 9"><use href="#d0" x="0" width="60" height="100"/><use href="#d9" x="76" width="60" height="100"/></svg>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
