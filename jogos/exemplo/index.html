@@ -135,7 +135,7 @@
       gap: 1rem;
       justify-items: center;
       padding-block: 2rem;
-      max-width: 44rem;
+      max-width: 52rem;
       margin: 0 auto;
     }
 
@@ -147,6 +147,11 @@
     .tela-centro p {
       margin: 0;
       font-size: 1.25rem;
+    }
+
+    .tela-centro .regras {
+      margin-top: 0.5rem;
+      font-size: 1.05rem;
     }
 
     .tela-centro .subtitulo {
@@ -195,26 +200,25 @@
       <!-- Tela inicial: escolha do nível -->
       <div class="tela-centro" id="telaInicio">
         <h2>Pronto para o desafio?</h2>
-        <p>São 10 perguntas de <strong>porcentagem</strong>. O cronômetro começa quando você escolher o nível.</p>
-        <p>Acerto de primeira vale <strong>100 pontos</strong>, acerto depois de errar vale <strong>50</strong>. Quem responde rápido ganha <strong>até 50 de bônus</strong>!</p>
-        <p class="subtitulo">Escolha o nível:</p>
+        <p>10 perguntas de <strong>porcentagem</strong>. Escolha o nível e o cronômetro começa na hora!</p>
         <div class="niveis">
-          <button class="nivel" data-nivel="facil">
+          <button class="nivel nivel--facil" data-nivel="facil">
             <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span></span><span></span></span>
             <span class="nivel__nome">Fácil</span>
             <span class="nivel__descricao">10%, 25% e 50% de números redondos. Contar a grade.</span>
           </button>
-          <button class="nivel" data-nivel="medio">
+          <button class="nivel nivel--medio" data-nivel="medio">
             <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span></span></span>
             <span class="nivel__nome">Médio</span>
             <span class="nivel__descricao">Mais porcentagens, como 5%, 30% e 75%.</span>
           </button>
-          <button class="nivel" data-nivel="dificil">
+          <button class="nivel nivel--dificil" data-nivel="dificil">
             <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span class="cheia"></span></span>
             <span class="nivel__nome">Difícil</span>
             <span class="nivel__descricao">Descontos, aumentos e "quantos por cento".</span>
           </button>
         </div>
+        <p class="regras">Acerto de primeira: 100 pontos · Depois de errar: 50 · Rapidez: até +50</p>
       </div>
 
       <!-- Tela do jogo -->
