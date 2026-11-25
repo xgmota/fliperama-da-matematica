@@ -3,10 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Pede aos sites de busca (Google etc.) para não listar esta página -->
+  <meta name="robots" content="noindex, nofollow">
   <title>Fliperama da Matemática</title>
   <link rel="stylesheet" href="estilo-comum.css">
   <style>
     /* ===== Estilo só da página inicial ===== */
+
+    /* Linha do evento no cabeçalho */
+    .cabecalho__evento {
+      margin: 0.75rem 0 0;
+      font-size: clamp(1rem, 1.6vw, 1.15rem);
+      font-weight: 600;
+      color: var(--texto-claro);
+    }
+
+    .cabecalho__evento strong {
+      color: var(--amarelo);
+    }
+
+    /* Título da parte "Jogos de exemplo" */
+    .inicio__secao {
+      margin: 3rem 0 1.25rem;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 900;
+      padding-bottom: 0.5rem;
+      border-bottom: 4px solid var(--branco);
+    }
+
+    /* Símbolos dos jogos de exemplo: traço mais fino que os números */
+    .simbolo {
+      stroke-width: 9;
+    }
+
+    .rodape p + p {
+      margin-top: 0.35rem;
+    }
 
     .inicio {
       max-width: var(--largura-max);
@@ -144,7 +176,8 @@
   <header class="cabecalho cabecalho--inicio">
     <div class="cabecalho__dentro">
       <h1 class="cabecalho__titulo">Fliperama da <span>Matemática</span></h1>
-      <p class="cabecalho__descricao">Os joguinhos de matemática criados pela turma, um pedido de cada vez.</p>
+      <!-- Evento e escola (pedido da professora) -->
+      <p class="cabecalho__evento">Culminância da Eletiva <strong>IA na Prática</strong> · Escola Estadual Barão de Suruí</p>
     </div>
   </header>
 
@@ -287,9 +320,39 @@
         <a class="botao zona__botao" href="jogos/grupo-10/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 10</span></a>
       </li>
     </ol>
+
+    <!-- Jogos de exemplo: não são de nenhum grupo -->
+    <h2 class="inicio__secao">Jogos de exemplo</h2>
+    <ul class="zonas">
+      <!-- Exemplo 1: porcentagem -->
+      <li class="zona" style="--cor-linha: var(--verde)">
+        <div class="zona__camisa">
+          <!-- Símbolo de porcentagem desenhado em SVG -->
+          <svg class="numero simbolo" viewBox="0 0 60 100" aria-hidden="true"><path d="M10 12 H24 V32 H10 Z M36 68 H50 V88 H36 Z M52 10 L8 90"/></svg>
+        </div>
+        <h3 class="zona__titulo">Desafio da Porcentagem</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>porcentagem</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/exemplo/index.html">Jogar<span class="so-leitor"> o Desafio da Porcentagem</span></a>
+      </li>
+      <!-- Exemplo 2: equações, potências e raízes -->
+      <li class="zona" style="--cor-linha: var(--amarelo)">
+        <div class="zona__camisa">
+          <!-- Sinal de raiz desenhado em SVG -->
+          <svg class="numero simbolo" viewBox="0 0 60 100" aria-hidden="true"><path d="M4 62 L14 56 L26 88 L40 10 H58"/></svg>
+        </div>
+        <h3 class="zona__titulo">Contra o Relógio</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>equações do 1º grau, potenciação e radiciação</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/exemplo-2/index.html">Jogar<span class="so-leitor"> o Contra o Relógio</span></a>
+      </li>
+    </ul>
   </main>
 
   <footer class="rodape">
+    <p>Eletiva IA na Prática · Escola Estadual Barão de Suruí · Professora responsável: Gabriela Mota</p>
     <p>Fliperama da Matemática · Funciona sem internet e não guarda nenhum dado de quem joga.</p>
   </footer>
 </body>
