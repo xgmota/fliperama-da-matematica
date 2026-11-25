@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contra o Relógio · Fliperama da Matemática</title>
+  <!-- Visual comum a todos os jogos (cores, cabeçalho e botões) -->
+  <link rel="stylesheet" href="../../estilo-comum.css">
+  <style>
+    /* ===== Estilo só deste jogo ===== */
+
+    .jogo {
+      max-width: 46rem;
+      margin: 0 auto;
+    }
+
+    .jogo__topo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .jogo__rodada {
+      margin: 0;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .jogo__placares {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    /* Etiqueta com o assunto da pergunta */
+    .assunto {
+      display: inline-block;
+      margin-left: 0.5rem;
+      padding: 0.1rem 0.6rem;
+      border-radius: 4px;
+      background: var(--azul-quadra);
+      color: var(--branco);
+      font-size: 1rem;
+    }
+
+    .pergunta {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.1rem, 2.4vw, 1.3rem);
+      font-weight: 700;
+    }
+
+    /* A conta em destaque */
+    .conta {
+      margin: 0 0 1.75rem;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .conta sup {
+      font-size: 0.55em;
+    }
+
+    /* Sinal de raiz com a "tampa" em cima do número */
+    .raiz {
+      white-space: nowrap;
+    }
+
+    .raiz__numero {
+      border-top: 0.08em solid currentColor;
+      padding: 0 0.08em;
+    }
+
+    .x {
+      color: var(--azul-quadra);
+      font-style: italic;
+    }
+
+    /* As 4 respostas */
+    .opcoes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .opcao {
+      min-height: 4rem;
+      font-size: 1.6rem;
+      background: var(--branco);
+      color: var(--texto-escuro);
+      box-shadow: inset 0 0 0 3px var(--azul-quadra), 0 4px 10px rgb(0 0 0 / 0.12);
+    }
+
+    .opcao:hover {
+      background: var(--amarelo);
+    }
+
+    .opcao sup {
+      font-size: 0.6em;
+    }
+
+    /* Resposta certa e resposta errada (com palavras na mensagem também) */
+    .opcao--certa,
+    .opcao--certa:hover {
+      background: var(--acerto-fundo);
+      box-shadow: inset 0 0 0 4px var(--acerto-linha);
+      color: var(--acerto-texto);
+      opacity: 1;
+    }
+
+    .opcao--errada,
+    .opcao--errada:hover {
+      background: var(--erro-fundo);
+      box-shadow: inset 0 0 0 4px var(--erro-linha);
+      color: var(--erro-texto);
+      text-decoration: line-through;
+      opacity: 1;
+    }
+
+    .explicacao {
+      margin: 0 0 1rem;
+      font-size: 1.15rem;
+    }
+
+    /* Tela inicial e tela final */
+    .tela-centro {
+      text-align: center;
+      display: grid;
+      gap: 1rem;
+      justify-items: center;
+      padding-block: 2rem;
+      max-width: 40rem;
+      margin: 0 auto;
+    }
+
+    .tela-centro h2 {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-weight: 900;
+    }
+
+    .tela-centro p {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 30rem) {
+      .opcoes {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho igual em todos os jogos -->
+  <header class="cabecalho">
+    <div class="cabecalho__dentro">
+      <a class="botao botao--voltar" href="../../index.html">← Voltar ao início</a>
+      <h1 class="cabecalho__titulo">Contra o Relógio</h1>
+      <p class="cabecalho__grupo">Jogo de <strong>exemplo</strong></p>
+    </div>
+  </header>
+
+  <main class="pagina-jogo">
+    <section class="area-jogo">
+
+      <!-- Tela inicial -->
+      <div class="tela-centro" id="telaInicio">
+        <h2>Pronto para o desafio?</h2>
+        <p>São 10 perguntas de <strong>equações do 1º grau</strong>, <strong>potenciação</strong> e <strong>radiciação</strong>. O cronômetro começa quando você apertar o botão.</p>
+        <button class="botao" id="comecar">Começar</button>
+      </div>
+
+      <!-- Tela do jogo -->
+      <div class="jogo" id="telaJogo" hidden>
+        <div class="jogo__topo">
+          <p class="jogo__rodada"><span id="rodada">Pergunta 1 de 10</span><span class="assunto" id="assunto"></span></p>
+          <div class="jogo__placares">
+            <div class="placar">Acertos <span class="placar__valor" id="placar">0</span></div>
+            <div class="placar">Tempo <span class="placar__valor" id="relogio">0:00</span></div>
+          </div>
+        </div>
+
+        <p class="pergunta" id="pergunta"></p>
+        <p class="conta" id="conta"></p>
+        <div class="opcoes" id="opcoes"></div>
+
+        <!-- Mensagem de acerto ou erro (o leitor de tela também lê) -->
+        <div aria-live="polite">
+          <p class="mensagem" id="mensagem" hidden></p>
+        </div>
+        <p class="explicacao" id="explicacao" hidden></p>
+        <button class="botao" id="proxima" hidden>Próxima pergunta</button>
+      </div>
+
+      <!-- Tela final -->
+      <div class="tela-centro" id="telaFinal" hidden>
+        <h2 id="tituloFinal"></h2>
+        <p id="textoFinal"></p>
+        <p id="tempoFinal"></p>
+        <button class="botao" id="denovo">Jogar de novo</button>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    // ===== Configuração =====
+    // Quantas perguntas de cada assunto (total: 10)
+    const QUANTAS = { equacao: 4, potencia: 3, raiz: 3 };
+    const TOTAL_PERGUNTAS = 10;
+
+    // ===== Elementos da página =====
+    const el = (id) => document.getElementById(id);
+
+    // ===== Estado do jogo (fica só na memória da página) =====
+    let perguntas = [];
+    let rodada = 0;
+    let acertos = 0;
+    let errouNestaRodada = false;
+    let inicio = 0;          // hora em que o jogo começou
+    let cronometro = null;   // o relógio que atualiza a tela
+
+    // ===== Ajudantes =====
+
+    // Número inteiro sorteado entre min e max
+    function sortear(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Sorteia um item de uma lista
+    function umDe(lista) {
+      return lista[sortear(0, lista.length - 1)];
+    }
+
+    // Embaralha uma lista
+    function embaralhar(lista) {
+      return lista
+        .map((item) => [Math.random(), item])
+        .sort((a, b) => a[0] - b[0])
+        .map((par) => par[1]);
+    }
+
+    // Escreve um número com o sinal de menos certinho: −3
+    function num(n) {
+      return n < 0 ? "−" + Math.abs(n) : String(n);
+    }
+
+    // Número negativo entre parênteses, para usar no meio da conta: (−3)
+    function numP(n) {
+      return n < 0 ? "(" + num(n) + ")" : String(n);
+    }
+
+    // "+ 5" ou "− 5", para escrever a conta
+    function maisMenos(n) {
+      return n < 0 ? " − " + Math.abs(n) : " + " + n;
+    }
+
+    // Termo com x: 1x vira x
+    function termoX(a) {
+      return (a === 1 ? "" : num(a)) + '<span class="x">x</span>';
+    }
+
+    // Potência escrita bonita: base com expoente em cima
+    function potencia(base, exp) {
+      return numP(base) + "<sup>" + exp + "</sup>";
+    }
+
+    // Raiz escrita bonita: √ ou ∛ com a tampa em cima do número
+    function raiz(n, indice) {
+      const simbolo = indice === 3 ? "∛" : "√";
+      return '<span class="raiz">' + simbolo + '<span class="raiz__numero">' + num(n) + "</span></span>";
+    }
+
+    // ===== Perguntas de EQUAÇÃO DO 1º GRAU =====
+
+    // ax + b = c
+    function equacaoSimples() {
+      const a = sortear(2, 9);
+      const x = sortear(-9, 12);
+      let b = sortear(-20, 20);
+      if (b === 0) b = 7;
+      const c = a * x + b;
+      return {
+        assunto: "Equação",
+        pergunta: "Qual é o valor de x?",
+        conta: termoX(a) + maisMenos(b) + " = " + num(c),
+        resposta: x,
+        erradas: [x + 1, x - 1, -x, (c + b) / a, c - b, x + 2],
+        explicacao:
+          `${a}x = ${num(c)}${maisMenos(-b)} → ${a}x = ${num(c - b)} → x = ${num(c - b)} ÷ ${a} = ${num(x)}.`,
+        confere: (r) => a * r + b === c,
+      };
+    }
+
+    // a(x + b) = c
+    function equacaoParenteses() {
+      const a = sortear(2, 6);
+      const x = sortear(-6, 10);
+      let b = sortear(-8, 9);
+      if (b === 0) b = 3;
+      const c = a * (x + b);
+      return {
+        assunto: "Equação",
+        pergunta: "Qual é o valor de x?",
+        conta: a + '(<span class="x">x</span>' + maisMenos(b) + ") = " + num(c),
+        resposta: x,
+        erradas: [x + 1, -x, c - b, c / a + b, x - 2, c - a * b + 1],
+        explicacao:
+          `Divida os dois lados por ${a}: x${maisMenos(b)} = ${num(c / a)} → x = ${num(c / a)}${maisMenos(-b)} = ${num(x)}.`,
+        confere: (r) => a * (r + b) === c,
+      };
+    }
+
+    // ax + b = cx + d
+    function equacaoDoisLados() {
+      const a = sortear(3, 9);
+      const c = sortear(1, a - 1);
+      const x = sortear(-8, 10);
+      let b = sortear(-15, 15);
+      if (b === 0) b = -4;
+      const d = (a - c) * x + b;
+      return {
+        assunto: "Equação",
+        pergunta: "Qual é o valor de x?",
+        conta: termoX(a) + maisMenos(b) + " = " + termoX(c) + (d === 0 ? "" : maisMenos(d)),
+        resposta: x,
+        erradas: [x + 1, -x, x - 1, (d + b) / (a - c), (d - b) / (a + c), x + 3],
+        explicacao:
+          `Junte o x de um lado: ${a}x − ${c === 1 ? "" : c}x = ${num(d)}${maisMenos(-b)} → ${a - c}x = ${num(d - b)} → x = ${num(x)}.`,
+        confere: (r) => a * r + b === c * r + d,
+      };
+    }
+
+    // ===== Perguntas de POTENCIAÇÃO =====
+
+    // Calcule a potência: 3⁴, (−2)³, 7⁰...
+    function potenciaValor() {
+      const opcoes = [
+        [2, sortear(2, 8)], [3, sortear(2, 4)], [4, sortear(2, 3)], [5, sortear(2, 3)],
+        [10, sortear(2, 5)], [-2, sortear(2, 5)], [-3, sortear(2, 3)], [sortear(6, 12), 2],
+        [sortear(2, 9), 0], [-1, sortear(5, 8)],
+      ];
+      const [base, exp] = umDe(opcoes);
+      const resp = Math.pow(base, exp);
+      let explicacao;
+      if (exp === 0) {
+        explicacao = "Todo número diferente de zero elevado a 0 dá 1.";
+      } else {
+        explicacao =
+          `${potencia(base, exp)} = ` + Array(exp).fill(numP(base)).join(" × ") + ` = ${num(resp)}.`;
+        if (base < 0) {
+          explicacao += exp % 2 === 0
+            ? " Base negativa com expoente par: o resultado é positivo."
+            : " Base negativa com expoente ímpar: o resultado é negativo.";
+        }
+      }
+      return {
+        assunto: "Potência",
+        pergunta: "Quanto vale esta potência?",
+        conta: potencia(base, exp),
+        resposta: resp,
+        erradas: [base * exp, -resp, resp * base, exp === 0 ? 0 : Math.pow(base, exp - 1), base + exp],
+        explicacao,
+        confere: (r) => r === Math.pow(base, exp),
+      };
+    }
+
+    // Propriedades: 2⁵ · 2³ = 2^? ou 5⁷ ÷ 5³ = 5^?
+    function potenciaPropriedade() {
+      const base = sortear(2, 9);
+      const m = sortear(3, 9);
+      const n = sortear(2, m - 1);
+      const multiplicar = Math.random() < 0.5;
+      const resp = multiplicar ? m + n : m - n;
+      return {
+        assunto: "Potência",
+        pergunta: "Qual expoente completa a conta?",
+        conta: potencia(base, m) + (multiplicar ? " · " : " ÷ ") + potencia(base, n) + " = " + base + "<sup>?</sup>",
+        resposta: resp,
+        erradas: multiplicar ? [m * n, resp + 1, m - n, resp - 1] : [m + n, Math.floor(m / n), resp + 1, m * n],
+        mostrar: (v) => base + "<sup>" + v + "</sup>",
+        explicacao: multiplicar
+          ? `Multiplicação de potências de mesma base: conserve a base e some os expoentes. ${m} + ${n} = ${resp}.`
+          : `Divisão de potências de mesma base: conserve a base e subtraia os expoentes. ${m} − ${n} = ${resp}.`,
+        confere: (r) => r === (multiplicar ? m + n : m - n),
+      };
+    }
+
+    // ===== Perguntas de RADICIAÇÃO =====
+
+    // Raiz quadrada exata: √144
+    function raizQuadrada() {
+      const r = sortear(2, 20);
+      const n = r * r;
+      return {
+        assunto: "Raiz",
+        pergunta: "Quanto vale esta raiz quadrada?",
+        conta: raiz(n, 2),
+        resposta: r,
+        erradas: [n / 2, r + 1, r - 1, 2 * r],
+        explicacao: `${r} × ${r} = ${n}, então ${raiz(n, 2)} = ${r}.`,
+        confere: (v) => v >= 0 && v * v === n,
+      };
+    }
+
+    // Raiz cúbica exata (pode ser negativa): ∛−27
+    function raizCubica() {
+      let r = sortear(-6, 10);
+      if (r === 0 || r === 1) r = 4;
+      const n = r * r * r;
+      return {
+        assunto: "Raiz",
+        pergunta: "Quanto vale esta raiz cúbica?",
+        conta: raiz(n, 3),
+        resposta: r,
+        erradas: [n / 3, -r, r + 1, r * r],
+        explicacao: `${numP(r)} × ${numP(r)} × ${numP(r)} = ${num(n)}, então ${raiz(n, 3)} = ${num(r)}.`,
+        confere: (v) => v * v * v === n,
+      };
+    }
+
+    // Soma de raízes: √36 + √64 (cuidado: não é √100!)
+    function raizSoma() {
+      let a = sortear(2, 12);
+      let b = sortear(2, 12);
+      if (a === b) b = a + 1;
+      const resp = a + b;
+      const errada = Math.sqrt(a * a + b * b); // erro comum: juntar tudo dentro da raiz
+      return {
+        assunto: "Raiz",
+        pergunta: "Quanto dá esta conta?",
+        conta: raiz(a * a, 2) + " + " + raiz(b * b, 2),
+        resposta: resp,
+        erradas: [Math.round(errada), resp + 1, a * b, resp - 2],
+        explicacao:
+          `Calcule cada raiz primeiro: ${raiz(a * a, 2)} = ${a} e ${raiz(b * b, 2)} = ${b}. Depois some: ${a} + ${b} = ${resp}.` +
+          ` Atenção: ${raiz(a * a, 2)} + ${raiz(b * b, 2)} não é igual a ${raiz(a * a + b * b, 2)}.`,
+        confere: (v) => v === a + b,
+      };
+    }
+
+    // ===== Montar a partida =====
+
+    function montarPartida() {
+      const lista = [];
+      for (let i = 0; i < QUANTAS.equacao; i++) {
+        lista.push(umDe([equacaoSimples, equacaoParenteses, equacaoDoisLados])());
+      }
+      for (let i = 0; i < QUANTAS.potencia; i++) {
+        lista.push(umDe([potenciaValor, potenciaValor, potenciaPropriedade])());
+      }
+      for (let i = 0; i < QUANTAS.raiz; i++) {
+        lista.push(umDe([raizQuadrada, raizCubica, raizSoma])());
+      }
+      return embaralhar(lista);
+    }
+
+    // Monta as 4 opções: a certa + 3 erradas diferentes (só números inteiros)
+    function montarOpcoes(resposta, erradas) {
+      const unicas = [...new Set(erradas)].filter(
+        (x) => Number.isInteger(x) && x !== resposta
+      );
+      const escolhidas = embaralhar(unicas).slice(0, 3);
+      // Garantia: se faltar opção, completa com números próximos
+      let extra = 2;
+      while (escolhidas.length < 3) {
+        const candidato = resposta + extra;
+        if (!escolhidas.includes(candidato) && candidato !== resposta) escolhidas.push(candidato);
+        extra = extra > 0 ? -extra : -extra + 1;
+      }
+      return embaralhar([resposta, ...escolhidas]);
+    }
+
+    // ===== Cronômetro =====
+
+    function tempoPassado() {
+      return Math.floor((Date.now() - inicio) / 1000);
+    }
+
+    function formatarTempo(segundos) {
+      const min = Math.floor(segundos / 60);
+      const seg = segundos % 60;
+      return min + ":" + String(seg).padStart(2, "0");
+    }
+
+    function ligarCronometro() {
+      inicio = Date.now();
+      el("relogio").textContent = "0:00";
+      cronometro = setInterval(() => {
+        el("relogio").textContent = formatarTempo(tempoPassado());
+      }, 1000);
+    }
+
+    function desligarCronometro() {
+      clearInterval(cronometro);
+      return tempoPassado();
+    }
+
+    // ===== Rodadas =====
+
+    function novaRodada() {
+      rodada++;
+      errouNestaRodada = false;
+      const p = perguntas[rodada - 1];
+
+      el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS}`;
+      el("assunto").textContent = p.assunto;
+      el("pergunta").textContent = p.pergunta;
+      el("conta").innerHTML = p.conta;
+
+      el("mensagem").hidden = true;
+      el("explicacao").hidden = true;
+      el("proxima").hidden = true;
+
+      // Cria os botões de resposta
+      const opcoes = el("opcoes");
+      opcoes.innerHTML = "";
+      montarOpcoes(p.resposta, p.erradas).forEach((valor) => {
+        const botao = document.createElement("button");
+        botao.className = "botao opcao";
+        botao.innerHTML = p.mostrar ? p.mostrar(valor) : num(valor);
+        botao.addEventListener("click", () => responder(botao, valor));
+        opcoes.appendChild(botao);
+      });
+    }
+
+    function responder(botao, valor) {
+      const p = perguntas[rodada - 1];
+      const mensagem = el("mensagem");
+      mensagem.hidden = false;
+
+      if (valor === p.resposta) {
+        // Acertou!
+        if (!errouNestaRodada) {
+          acertos++;
+          el("placar").textContent = acertos;
+        }
+        botao.classList.add("opcao--certa");
+        mensagem.className = "mensagem mensagem--acerto";
+        mensagem.textContent = errouNestaRodada ? "Acertou! Agora foi." : "Acertou! Na primeira!";
+        el("explicacao").innerHTML = p.explicacao;
+        el("explicacao").hidden = false;
+
+        // Trava as opções e mostra o botão de seguir
+        el("opcoes").querySelectorAll("button").forEach((b) => (b.disabled = true));
+        const proxima = el("proxima");
+        proxima.textContent = rodada < TOTAL_PERGUNTAS ? "Próxima pergunta" : "Ver resultado";
+        proxima.hidden = false;
+        proxima.focus();
+      } else {
+        // Errou: marca e deixa tentar de novo
+        errouNestaRodada = true;
+        botao.classList.add("opcao--errada");
+        botao.disabled = true;
+        mensagem.className = "mensagem mensagem--erro";
+        mensagem.textContent = `Ainda não! ${botao.textContent} não é a resposta. Tente de novo.`;
+      }
+    }
+
+    function mostrarFinal() {
+      const segundos = desligarCronometro();
+      el("telaJogo").hidden = true;
+      el("telaFinal").hidden = false;
+      el("tituloFinal").textContent =
+        acertos >= 8 ? "Que jogada!" : acertos >= 5 ? "Mandou bem!" : "Bora treinar mais!";
+      el("textoFinal").textContent = `Você acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira.`;
+      const min = Math.floor(segundos / 60);
+      const seg = segundos % 60;
+      el("tempoFinal").textContent =
+        "Seu tempo: " + (min > 0 ? `${min} min e ` : "") + `${seg} s. Será que dá para ser mais rápido?`;
+      el("denovo").focus();
+    }
+
+    function comecar() {
+      perguntas = montarPartida();
+      rodada = 0;
+      acertos = 0;
+      el("placar").textContent = "0";
+      el("telaInicio").hidden = true;
+      el("telaFinal").hidden = true;
+      el("telaJogo").hidden = false;
+      ligarCronometro();
+      novaRodada();
+    }
+
+    el("comecar").addEventListener("click", comecar);
+    el("denovo").addEventListener("click", comecar);
+    el("proxima").addEventListener("click", () => {
+      if (rodada < TOTAL_PERGUNTAS) novaRodada();
+      else mostrarFinal();
+    });
+  </script>
+</body>
+</html>
