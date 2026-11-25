@@ -31,6 +31,113 @@
       border-bottom: 4px solid var(--branco);
     }
 
+    .inicio__secao--primeira {
+      margin-top: 0;
+    }
+
+    /* ===== Pódio ===== */
+    .podio {
+      list-style: none;
+      margin: 0 auto;
+      padding: 0;
+      max-width: 46rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: end;
+      gap: 0.75rem;
+    }
+
+    /* 2º à esquerda, 1º no meio, 3º à direita */
+    .degrau--1 { order: 2; }
+    .degrau--2 { order: 1; }
+    .degrau--3 { order: 3; }
+
+    .degrau {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .degrau__nick {
+      max-width: 100%;
+      font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .degrau__pontos {
+      color: var(--cor-linha);
+      font-weight: 800;
+    }
+
+    .degrau__jogos {
+      min-height: 1.5em;
+      font-size: 1rem;
+      color: var(--texto-claro-suave);
+    }
+
+    .degrau__bloco {
+      width: 100%;
+      margin-top: 0.5rem;
+      display: grid;
+      place-items: center;
+      background: var(--azul-noite);
+      border-top: 6px solid var(--cor-linha);
+      border-radius: var(--canto) var(--canto) 0 0;
+      box-shadow: var(--sombra);
+    }
+
+    .degrau__bloco .numero {
+      height: 3.5rem;
+      stroke-width: 12;
+    }
+
+    .degrau--1 .degrau__bloco { height: 9rem; }
+    .degrau--2 .degrau__bloco { height: 6.5rem; }
+    .degrau--3 .degrau__bloco { height: 4.75rem; }
+
+    /* Do 4º ao 10º */
+    .podio-lista {
+      max-width: 46rem;
+      margin: 1.25rem auto 0;
+      padding: 0.75rem 1.25rem 0.75rem 3rem;
+      background: var(--azul-garrafao);
+      border-radius: var(--canto);
+      box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.28);
+      color: var(--texto-claro-suave);
+    }
+
+    .podio-lista li {
+      padding: 0.3rem 0;
+    }
+
+    .podio-lista li::marker {
+      color: var(--amarelo);
+      font-weight: 800;
+    }
+
+    .podio-lista strong {
+      color: var(--texto-claro);
+    }
+
+    .podio-rodape {
+      max-width: 46rem;
+      margin: 1rem auto 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--texto-claro-suave);
+    }
+
+    .podio-rodape p {
+      margin: 0;
+    }
+
     /* Símbolos dos jogos de exemplo: traço mais fino que os números */
     .simbolo {
       stroke-width: 9;
@@ -182,6 +289,20 @@
   </header>
 
   <main class="inicio">
+
+    <!-- Pódio: média dos recordes no nível Difícil (guardado só neste computador) -->
+    <section aria-labelledby="tituloPodio">
+      <h2 class="inicio__secao inicio__secao--primeira" id="tituloPodio">Pódio do Fliperama</h2>
+      <p class="inicio__dica">Média dos recordes no nível <strong>Difícil</strong>, nos jogos que cada um jogou.</p>
+      <ol class="podio" id="podio"></ol>
+      <ol class="podio-lista" id="podioLista" start="4"></ol>
+      <div class="podio-rodape">
+        <p>O ranking fica guardado só neste computador.</p>
+        <button class="botao botao--voltar" id="apagarRanking">Apagar ranking</button>
+      </div>
+    </section>
+
+    <h2 class="inicio__secao">Jogos dos grupos</h2>
     <p class="inicio__dica">Cada número é um grupo. <strong>Encontre o seu e aperte Jogar!</strong></p>
 
     <!--
@@ -355,5 +476,68 @@
     <p>Eletiva IA na Prática · Escola Estadual Barão de Suruí · Professora responsável: Gabriela Mota</p>
     <p>Fliperama da Matemática · Funciona sem internet e não guarda nenhum dado de quem joga.</p>
   </footer>
+  <!-- Ranking guardado só neste computador -->
+  <script src="ranking-comum.js"></script>
+  <script>
+    // ===== Pódio do Fliperama =====
+    const CORES_DO_PODIO = ["amarelo", "branco", "verde"]; // 1º, 2º e 3º lugar
+
+    function desenharPodio() {
+      const lista = Ranking.podio("dificil", 10);
+      const podio = document.getElementById("podio");
+      const resto = document.getElementById("podioLista");
+      podio.innerHTML = "";
+      resto.innerHTML = "";
+
+      // Os 3 degraus (mesmo vazios, para mostrar o pódio)
+      for (let i = 0; i < 3; i++) {
+        const aluno = lista[i];
+        const degrau = document.createElement("li");
+        degrau.className = `degrau degrau--${i + 1}`;
+        degrau.style.setProperty("--cor-linha", `var(--${CORES_DO_PODIO[i]})`);
+
+        const nome = document.createElement("span");
+        nome.className = "degrau__nick";
+        nome.textContent = aluno ? aluno.nick : "Vago";
+        const pontos = document.createElement("span");
+        pontos.className = "degrau__pontos";
+        pontos.textContent = aluno ? `${aluno.media} pontos` : "Jogue no Difícil!";
+        const jogos = document.createElement("span");
+        jogos.className = "degrau__jogos";
+        jogos.textContent = aluno ? `média de ${aluno.jogos} ${aluno.jogos === 1 ? "jogo" : "jogos"}` : "";
+
+        // Bloco do pódio com o número desenhado
+        const bloco = document.createElement("div");
+        bloco.className = "degrau__bloco";
+        bloco.innerHTML =
+          `<svg class="numero" viewBox="0 0 60 100" role="img" aria-label="${i + 1}º lugar"><use href="#d${i + 1}" width="60" height="100"/></svg>`;
+
+        degrau.append(nome, pontos, jogos, bloco);
+        podio.appendChild(degrau);
+      }
+
+      // Do 4º ao 10º lugar
+      lista.slice(3).forEach((aluno) => {
+        const item = document.createElement("li");
+        const nome = document.createElement("strong");
+        nome.textContent = aluno.nick;
+        item.append(nome, ` · ${aluno.media} pontos · média de ${aluno.jogos} ${aluno.jogos === 1 ? "jogo" : "jogos"}`);
+        resto.appendChild(item);
+      });
+      resto.hidden = lista.length <= 3;
+    }
+
+    // Apagar o ranking: pede para digitar APAGAR, para ninguém apagar sem querer
+    document.getElementById("apagarRanking").addEventListener("click", () => {
+      const resposta = prompt("Isso apaga o ranking de TODOS os jogos neste computador. Para confirmar, digite APAGAR:");
+      if (resposta && resposta.trim().toUpperCase() === "APAGAR") {
+        Ranking.apagarTudo();
+        desenharPodio();
+        alert("Pronto! O ranking deste computador foi apagado.");
+      }
+    });
+
+    desenharPodio();
+  </script>
 </body>
 </html>

@@ -466,6 +466,128 @@ h3 {
   .nivel__descricao { max-width: none; }
 }
 
+/* ---------- 9c. Ranking (tabela, campo do nome e abas dos níveis) ---------- */
+
+/* Caixa "Quer entrar no ranking?" */
+.caixa-ranking {
+  display: grid;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 34rem;
+  padding: 1.25rem;
+  border-radius: var(--canto);
+  background: var(--branco);
+  box-shadow: inset 0 0 0 3px var(--linha-piso-claro);
+  text-align: left;
+}
+
+.caixa-ranking label {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.caixa-ranking__linha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.caixa-ranking__linha .campo {
+  flex: 1 1 12rem;
+}
+
+/* Campo de texto */
+.campo {
+  min-height: 3rem;
+  padding: 0.5rem 0.9rem;
+  border: 3px solid var(--azul-quadra);
+  border-radius: var(--canto);
+  background: var(--branco);
+  color: var(--texto-escuro);
+  font: inherit;
+  font-size: 1.1rem;
+}
+
+.campo::placeholder {
+  color: #5b6b86;
+}
+
+/* Abas Fácil / Médio / Difícil */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.aba {
+  min-height: 2.75rem;
+  padding: 0.4rem 1.1rem;
+  border: 0;
+  border-radius: var(--canto);
+  background: var(--branco);
+  color: var(--texto-escuro);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 3px var(--azul-quadra);
+}
+
+.aba[aria-selected="true"] {
+  background: var(--azul-noite);
+  color: var(--amarelo);
+  box-shadow: none;
+}
+
+/* Tabela do ranking */
+.ranking {
+  width: 100%;
+  max-width: 34rem;
+  border-collapse: collapse;
+  background: var(--branco);
+  border-radius: var(--canto);
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.ranking th {
+  background: var(--azul-noite);
+  color: var(--texto-claro);
+  font-weight: 800;
+  padding: 0.6rem 0.8rem;
+}
+
+.ranking td {
+  padding: 0.55rem 0.8rem;
+  border-top: 1px solid var(--linha-piso-claro);
+}
+
+.ranking td:first-child,
+.ranking th:first-child {
+  width: 3.5rem;
+  font-weight: 800;
+}
+
+.ranking td:nth-child(3),
+.ranking th:nth-child(3),
+.ranking td:nth-child(4),
+.ranking th:nth-child(4) {
+  text-align: right;
+}
+
+/* Linha de quem acabou de jogar */
+.ranking__voce td {
+  background: var(--amarelo);
+  font-weight: 800;
+}
+
+.ranking__vazio {
+  margin: 0;
+  padding: 1rem;
+  font-weight: 700;
+}
+
 /* ---------- 10. Rodapé ---------- */
 .rodape {
   max-width: var(--largura-max);

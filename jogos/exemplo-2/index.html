@@ -153,6 +153,16 @@
       font-size: 1.25rem;
     }
 
+    .tela-centro h3 {
+      margin-top: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+
+    .tela-centro .dica-ranking {
+      font-size: 1rem;
+    }
+
     .tela-centro .regras {
       margin-top: 0.5rem;
       font-size: 1.05rem;
@@ -218,6 +228,20 @@
           </button>
         </div>
         <p class="regras">Acerto de primeira: 100 pontos · Depois de errar: 50 · Rapidez: até +50</p>
+        <button class="botao botao--secundario" id="verRanking">Ver ranking</button>
+      </div>
+
+      <!-- Tela do ranking (com abas dos níveis) -->
+      <div class="tela-centro" id="telaRanking" hidden>
+        <h2>Ranking</h2>
+        <p>Os 10 melhores deste computador.</p>
+        <div class="abas" role="tablist" aria-label="Nível do ranking">
+          <button class="aba" role="tab" data-aba="facil" aria-selected="false">Fácil</button>
+          <button class="aba" role="tab" data-aba="medio" aria-selected="false">Médio</button>
+          <button class="aba" role="tab" data-aba="dificil" aria-selected="false">Difícil</button>
+        </div>
+        <div id="tabelaRanking"></div>
+        <button class="botao" id="voltarDoRanking">Voltar</button>
       </div>
 
       <!-- Tela do jogo -->
@@ -247,6 +271,21 @@
         <h2 id="tituloFinal"></h2>
         <p id="textoFinal"></p>
         <p id="tempoFinal"></p>
+
+        <!-- Entrar no ranking: só se o aluno quiser -->
+        <div class="caixa-ranking" id="caixaRanking">
+          <label for="nick">Quer entrar no ranking?</label>
+          <p class="dica-ranking">Só se quiser. Use o primeiro nome ou um apelido, sem sobrenome.</p>
+          <div class="caixa-ranking__linha" id="linhaRanking">
+            <input class="campo" id="nick" maxlength="20" autocomplete="off" placeholder="Nome ou apelido">
+            <button class="botao" id="salvarRanking">Salvar</button>
+            <button class="botao botao--secundario" id="pularRanking">Agora não</button>
+          </div>
+          <p class="mensagem" id="mensagemRanking" hidden></p>
+        </div>
+
+        <h3 id="tituloRankingFinal">Ranking</h3>
+        <div id="rankingFinal"></div>
         <div class="botoes-final">
           <button class="botao" id="denovo">Jogar de novo</button>
           <button class="botao botao--secundario" id="mudarNivel">Mudar de nível</button>
@@ -256,12 +295,18 @@
     </section>
   </main>
 
+  <!-- Ranking guardado só neste computador (igual em todos os jogos) -->
+  <script src="../../ranking-comum.js"></script>
   <script>
     // ===== Configuração =====
     // Quantas perguntas de cada assunto (total: 10)
     const QUANTAS = { equacao: 4, potencia: 3, raiz: 3 };
     const TOTAL_PERGUNTAS = 10;
     const NOMES_DOS_NIVEIS = { facil: "Fácil", medio: "Médio", dificil: "Difícil" };
+
+    // Nome do jogo no ranking (cada jogo tem o seu)
+    const JOGO_ID = "exemplo-2";
+    const NOME_DO_JOGO = "Contra o Relógio";
 
     // ===== Elementos da página =====
     const el = (id) => document.getElementById(id);
@@ -275,6 +320,7 @@
     let inicio = 0;          // hora em que o jogo começou
     let cronometro = null;   // o relógio que atualiza a tela
     let pontos = 0;
+    let tempoDaPartida = 0;  // tempo total da última partida (para o ranking)
     let inicioPergunta = 0;  // hora em que a pergunta apareceu
 
     // ===== Ajudantes =====
@@ -751,8 +797,71 @@
       const seg = segundos % 60;
       el("tempoFinal").textContent =
         "Seu tempo: " + (min > 0 ? `${min} min e ` : "") + `${seg} s. Será que dá para ser mais rápido?`;
-      el("denovo").focus();
+      // Ranking: mostra a caixa para salvar e o ranking deste nível
+      tempoDaPartida = segundos;
+      el("nick").value = "";
+      el("linhaRanking").hidden = false;
+      el("caixaRanking").hidden = false;
+      el("mensagemRanking").hidden = true;
+      el("tituloRankingFinal").textContent = `Ranking · Nível ${NOMES_DOS_NIVEIS[nivel]}`;
+      Ranking.desenharTabela(el("rankingFinal"), JOGO_ID, nivel);
     }
+
+    // ===== Ranking =====
+
+    function salvarNoRanking() {
+      const msg = el("mensagemRanking");
+      const conferido = Ranking.validarNick(el("nick").value);
+      msg.hidden = false;
+      if (!conferido.ok) {
+        msg.className = "mensagem mensagem--erro";
+        msg.textContent = conferido.erro;
+        return;
+      }
+      const nick = conferido.nick;
+      const r = Ranking.salvar({
+        jogo: JOGO_ID, nomeDoJogo: NOME_DO_JOGO, nivel, nick, pontos, tempo: tempoDaPartida,
+      });
+      if (!r.gravou) {
+        msg.className = "mensagem mensagem--erro";
+        msg.textContent = "Não deu para salvar neste navegador.";
+        return;
+      }
+      msg.className = "mensagem mensagem--acerto";
+      if (r.recorde && r.anterior) msg.textContent = `Novo recorde, ${nick}! Antes eram ${r.anterior.pontos} pontos.`;
+      else if (r.recorde) msg.textContent = `Pronto, ${nick}! Você entrou no ranking.`;
+      else msg.textContent = `Boa, ${nick}! Seu recorde continua ${r.atual.pontos} pontos.`;
+      el("linhaRanking").hidden = true; // salva só uma vez por partida
+      Ranking.desenharTabela(el("rankingFinal"), JOGO_ID, nivel, nick);
+    }
+
+    // Abre a tela do ranking na aba do nível escolhido
+    function abrirRanking(nivelDaAba) {
+      document.querySelectorAll(".aba").forEach((aba) => {
+        aba.setAttribute("aria-selected", aba.dataset.aba === nivelDaAba ? "true" : "false");
+      });
+      Ranking.desenharTabela(el("tabelaRanking"), JOGO_ID, nivelDaAba);
+    }
+
+    el("salvarRanking").addEventListener("click", salvarNoRanking);
+    el("nick").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") salvarNoRanking();
+    });
+    el("pularRanking").addEventListener("click", () => {
+      el("caixaRanking").hidden = true;
+    });
+    el("verRanking").addEventListener("click", () => {
+      el("telaInicio").hidden = true;
+      el("telaRanking").hidden = false;
+      abrirRanking(nivel);
+    });
+    document.querySelectorAll(".aba").forEach((aba) => {
+      aba.addEventListener("click", () => abrirRanking(aba.dataset.aba));
+    });
+    el("voltarDoRanking").addEventListener("click", () => {
+      el("telaRanking").hidden = true;
+      el("telaInicio").hidden = false;
+    });
 
     function comecar() {
       perguntas = montarPartida();
