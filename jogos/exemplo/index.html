@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desafio da Porcentagem · Fliperama da Matemática</title>
+  <!-- Visual comum a todos os jogos (cores, cabeçalho e botões) -->
+  <link rel="stylesheet" href="../../estilo-comum.css">
+  <style>
+    /* ===== Estilo só deste jogo ===== */
+
+    .jogo {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+      gap: 2rem 3rem;
+      align-items: start;
+    }
+
+    .jogo__topo {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .jogo__rodada {
+      margin: 0;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .pergunta {
+      margin: 0 0 1.5rem;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .pergunta strong {
+      color: var(--azul-quadra);
+    }
+
+    /* As 4 respostas */
+    .opcoes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .opcao {
+      min-height: 4rem;
+      font-size: 1.6rem;
+      background: var(--branco);
+      color: var(--texto-escuro);
+      box-shadow: inset 0 0 0 3px var(--azul-quadra), 0 4px 10px rgb(0 0 0 / 0.12);
+    }
+
+    .opcao:hover {
+      background: var(--amarelo);
+    }
+
+    /* Resposta certa e resposta errada (com palavras na mensagem também) */
+    .opcao--certa,
+    .opcao--certa:hover {
+      background: var(--acerto-fundo);
+      box-shadow: inset 0 0 0 4px var(--acerto-linha);
+      color: var(--acerto-texto);
+      opacity: 1;
+    }
+
+    .opcao--errada,
+    .opcao--errada:hover {
+      background: var(--erro-fundo);
+      box-shadow: inset 0 0 0 4px var(--erro-linha);
+      color: var(--erro-texto);
+      text-decoration: line-through;
+    }
+
+    .explicacao {
+      margin: 0 0 1rem;
+      font-size: 1.15rem;
+    }
+
+    /* Grade de 100 quadradinhos: cada um vale 1% */
+    .grade {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 3px;
+      padding: 8px;
+      background: var(--azul-noite);
+      border-radius: var(--canto);
+      aspect-ratio: 1;
+    }
+
+    .grade span {
+      background: var(--branco);
+      border-radius: 2px;
+    }
+
+    .grade span.pintado {
+      background: var(--amarelo);
+    }
+
+    .grade__legenda {
+      margin: 0.75rem 0 0;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* Tela final */
+    .final {
+      text-align: center;
+      display: grid;
+      gap: 1rem;
+      justify-items: center;
+      padding-block: 2rem;
+    }
+
+    .final h2 {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-weight: 900;
+    }
+
+    .final p {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 48rem) {
+      .jogo {
+        grid-template-columns: 1fr;
+      }
+      .jogo__grade {
+        max-width: 18rem;
+        width: 100%;
+        justify-self: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho igual em todos os jogos -->
+  <header class="cabecalho">
+    <div class="cabecalho__dentro">
+      <a class="botao botao--voltar" href="../../index.html">← Voltar ao início</a>
+      <h1 class="cabecalho__titulo">Desafio da Porcentagem</h1>
+      <p class="cabecalho__grupo">Jogo de <strong>exemplo</strong></p>
+    </div>
+  </header>
+
+  <main class="pagina-jogo">
+    <section class="area-jogo">
+
+      <!-- Tela do jogo -->
+      <div class="jogo" id="telaJogo">
+        <div class="jogo__topo">
+          <p class="jogo__rodada" id="rodada">Pergunta 1 de 10</p>
+          <div class="placar">
+            Acertos de primeira
+            <span class="placar__valor" id="placar">0</span>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="pergunta" id="pergunta"></h2>
+          <div class="opcoes" id="opcoes"></div>
+
+          <!-- Mensagem de acerto ou erro (o leitor de tela também lê) -->
+          <div aria-live="polite">
+            <p class="mensagem" id="mensagem" hidden></p>
+          </div>
+          <p class="explicacao" id="explicacao" hidden></p>
+          <button class="botao" id="proxima" hidden>Próxima pergunta</button>
+        </div>
+
+        <div class="jogo__grade">
+          <div class="grade" id="grade" role="img"></div>
+          <p class="grade__legenda" id="legenda">Cada quadradinho vale 1%</p>
+        </div>
+      </div>
+
+      <!-- Tela final -->
+      <div class="final" id="telaFinal" hidden>
+        <h2 id="tituloFinal"></h2>
+        <p id="textoFinal"></p>
+        <button class="botao" id="denovo">Jogar de novo</button>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    // ===== Configuração =====
+    const TOTAL_PERGUNTAS = 10;
+
+    // Porcentagens usadas no jogo e os números que dão conta exata com cada uma
+    const PORCENTAGENS = [10, 20, 25, 50, 75, 5, 30, 40, 60, 90];
+
+    // ===== Elementos da página =====
+    const el = (id) => document.getElementById(id);
+    const grade = el("grade");
+
+    // ===== Estado do jogo (fica só na memória da página) =====
+    let rodada = 0;
+    let acertos = 0;
+    let errouNestaRodada = false;
+    let perguntaAtual = null;
+
+    // Cria os 100 quadradinhos da grade uma vez só
+    for (let i = 0; i < 100; i++) {
+      grade.appendChild(document.createElement("span"));
+    }
+
+    // Número inteiro sorteado entre min e max
+    function sortear(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Embaralha uma lista
+    function embaralhar(lista) {
+      return lista
+        .map((item) => [Math.random(), item])
+        .sort((a, b) => a[0] - b[0])
+        .map((par) => par[1]);
+    }
+
+    // Pinta "quantos" quadradinhos da grade
+    function pintarGrade(quantos) {
+      grade.querySelectorAll("span").forEach((q, i) => {
+        q.classList.toggle("pintado", i < quantos);
+      });
+      grade.setAttribute("aria-label", quantos + " de 100 quadradinhos pintados");
+    }
+
+    // ----- Tipo 1: "Quanto é 25% de 80?" -----
+    function perguntaDeValor() {
+      const p = PORCENTAGENS[sortear(0, PORCENTAGENS.length - 1)];
+      // Escolhe um número que deixa a conta exata (resultado inteiro)
+      const passo = 100 / mdc(p, 100);
+      const n = passo * sortear(1, Math.max(1, Math.floor(200 / passo)));
+      const resposta = (p * n) / 100;
+
+      // Respostas erradas parecidas com erros comuns
+      const erradas = [
+        (p * n) / 10,     // esqueceu um zero
+        n - resposta,     // calculou o que sobra
+        resposta + passo,  // conta perto
+        resposta * 2,
+        Math.max(1, resposta - 5),
+        resposta + 10,
+      ];
+
+      return {
+        texto: `Quanto é <strong>${p}%</strong> de <strong>${n}</strong>?`,
+        resposta,
+        erradas,
+        pintar: p,
+        legenda: `${p}% são ${p} quadradinhos de 100`,
+        explicacao: `${p}% de ${n} = ${p} × ${n} ÷ 100 = ${resposta}.` + dica(p, n),
+        sufixo: "",
+      };
+    }
+
+    // ----- Tipo 2: "Que porcentagem da grade está pintada?" -----
+    function perguntaDaGrade() {
+      const k = sortear(1, 19) * 5; // 5%, 10%, 15%... até 95%
+      const erradas = [100 - k, k + 10, k - 10, k + 5, k - 5, k / 5];
+      return {
+        texto: "Que porcentagem da grade está <strong>pintada</strong>?",
+        resposta: k,
+        erradas,
+        pintar: k,
+        legenda: "Conte os quadradinhos amarelos",
+        explicacao: `São ${k} quadradinhos pintados de 100. Então ${k}% da grade está pintada.`,
+        sufixo: "%",
+      };
+    }
+
+    // Dicas de atalho para algumas porcentagens
+    function dica(p, n) {
+      if (p === 50) return ` Atalho: 50% é a metade, ${n} ÷ 2.`;
+      if (p === 25) return ` Atalho: 25% é um quarto, ${n} ÷ 4.`;
+      if (p === 10) return ` Atalho: 10% é dividir por 10, ${n} ÷ 10.`;
+      if (p === 75) return ` Atalho: 75% são três quartos, ${n} ÷ 4 × 3.`;
+      if (p === 20) return ` Atalho: 20% é um quinto, ${n} ÷ 5.`;
+      if (p === 5) return ` Atalho: 5% é a metade de 10%.`;
+      return "";
+    }
+
+    // Máximo divisor comum (ajuda a achar números com conta exata)
+    function mdc(a, b) {
+      return b === 0 ? a : mdc(b, a % b);
+    }
+
+    // Monta as 4 opções: a certa + 3 erradas diferentes e positivas
+    function montarOpcoes(resposta, erradas) {
+      const unicas = [...new Set(erradas)].filter(
+        (x) => Number.isInteger(x) && x > 0 && x !== resposta
+      );
+      const escolhidas = embaralhar(unicas).slice(0, 3);
+      // Garantia: se faltar opção, completa com números próximos
+      let extra = 1;
+      while (escolhidas.length < 3) {
+        const candidato = resposta + extra;
+        if (!escolhidas.includes(candidato)) escolhidas.push(candidato);
+        extra++;
+      }
+      return embaralhar([resposta, ...escolhidas]);
+    }
+
+    // ===== Rodadas =====
+    function novaRodada() {
+      rodada++;
+      errouNestaRodada = false;
+      perguntaAtual = Math.random() < 0.6 ? perguntaDeValor() : perguntaDaGrade();
+
+      el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS}`;
+      el("pergunta").innerHTML = perguntaAtual.texto;
+      el("legenda").textContent = perguntaAtual.legenda;
+      pintarGrade(perguntaAtual.pintar);
+
+      el("mensagem").hidden = true;
+      el("explicacao").hidden = true;
+      el("proxima").hidden = true;
+
+      // Cria os botões de resposta
+      const opcoes = el("opcoes");
+      opcoes.innerHTML = "";
+      montarOpcoes(perguntaAtual.resposta, perguntaAtual.erradas).forEach((valor) => {
+        const botao = document.createElement("button");
+        botao.className = "botao opcao";
+        botao.textContent = valor + perguntaAtual.sufixo;
+        botao.addEventListener("click", () => responder(botao, valor));
+        opcoes.appendChild(botao);
+      });
+    }
+
+    function responder(botao, valor) {
+      const mensagem = el("mensagem");
+      mensagem.hidden = false;
+
+      if (valor === perguntaAtual.resposta) {
+        // Acertou!
+        if (!errouNestaRodada) {
+          acertos++;
+          el("placar").textContent = acertos;
+        }
+        botao.classList.add("opcao--certa");
+        mensagem.className = "mensagem mensagem--acerto";
+        mensagem.textContent = errouNestaRodada ? "Acertou! Agora foi." : "Acertou! Na primeira!";
+        el("explicacao").textContent = perguntaAtual.explicacao;
+        el("explicacao").hidden = false;
+
+        // Trava as opções e mostra o botão de seguir
+        el("opcoes").querySelectorAll("button").forEach((b) => (b.disabled = true));
+        const proxima = el("proxima");
+        proxima.textContent = rodada < TOTAL_PERGUNTAS ? "Próxima pergunta" : "Ver resultado";
+        proxima.hidden = false;
+        proxima.focus();
+      } else {
+        // Errou: marca e deixa tentar de novo
+        errouNestaRodada = true;
+        botao.classList.add("opcao--errada");
+        botao.disabled = true;
+        mensagem.className = "mensagem mensagem--erro";
+        mensagem.textContent = `Ainda não! ${botao.textContent} não é a resposta. Tente de novo.`;
+      }
+    }
+
+    function mostrarFinal() {
+      el("telaJogo").hidden = true;
+      el("telaFinal").hidden = false;
+      // A nota também vira porcentagem!
+      const porcento = (acertos / TOTAL_PERGUNTAS) * 100;
+      el("tituloFinal").textContent =
+        acertos >= 8 ? "Que jogada!" : acertos >= 5 ? "Mandou bem!" : "Bora treinar mais!";
+      el("textoFinal").textContent =
+        `Você acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira. Isso é ${porcento}% de acerto!`;
+      el("denovo").focus();
+    }
+
+    function recomecar() {
+      rodada = 0;
+      acertos = 0;
+      el("placar").textContent = "0";
+      el("telaFinal").hidden = true;
+      el("telaJogo").hidden = false;
+      novaRodada();
+    }
+
+    el("proxima").addEventListener("click", () => {
+      if (rodada < TOTAL_PERGUNTAS) novaRodada();
+      else mostrarFinal();
+    });
+    el("denovo").addEventListener("click", recomecar);
+
+    // Começa o jogo
+    novaRodada();
+  </script>
+</body>
+</html>
