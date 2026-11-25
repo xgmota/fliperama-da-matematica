@@ -135,10 +135,11 @@
     .tela-centro {
       text-align: center;
       display: grid;
+      grid-template-columns: minmax(0, 1fr); /* não deixa passar da largura da tela */
       gap: 1rem;
       justify-items: center;
       padding-block: 2rem;
-      max-width: 40rem;
+      max-width: 44rem;
       margin: 0 auto;
     }
 
@@ -150,6 +151,19 @@
     .tela-centro p {
       margin: 0;
       font-size: 1.25rem;
+    }
+
+    .tela-centro .subtitulo {
+      margin-top: 0.75rem;
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .botoes-final {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
     }
 
     [hidden] {
@@ -180,9 +194,26 @@
       <!-- Tela inicial -->
       <div class="tela-centro" id="telaInicio">
         <h2>Pronto para o desafio?</h2>
-        <p>São 10 perguntas de <strong>equações do 1º grau</strong>, <strong>potenciação</strong> e <strong>radiciação</strong>. O cronômetro começa quando você apertar o botão.</p>
+        <p>São 10 perguntas de <strong>equações do 1º grau</strong>, <strong>potenciação</strong> e <strong>radiciação</strong>. O cronômetro começa quando você escolher o nível.</p>
         <p>Acerto de primeira vale <strong>100 pontos</strong>, acerto depois de errar vale <strong>50</strong>. Quem responde rápido ganha <strong>até 50 de bônus</strong>!</p>
-        <button class="botao" id="comecar">Começar</button>
+        <p class="subtitulo">Escolha o nível:</p>
+        <div class="niveis">
+          <button class="nivel" data-nivel="facil">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span></span><span></span></span>
+            <span class="nivel__nome">Fácil</span>
+            <span class="nivel__descricao">Números positivos e pequenos. Bom para aquecer!</span>
+          </button>
+          <button class="nivel" data-nivel="medio">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span></span></span>
+            <span class="nivel__nome">Médio</span>
+            <span class="nivel__descricao">Negativos, parênteses e propriedades das potências.</span>
+          </button>
+          <button class="nivel" data-nivel="dificil">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span class="cheia"></span></span>
+            <span class="nivel__nome">Difícil</span>
+            <span class="nivel__descricao">Números maiores e pegadinhas de sinal.</span>
+          </button>
+        </div>
       </div>
 
       <!-- Tela do jogo -->
@@ -212,7 +243,10 @@
         <h2 id="tituloFinal"></h2>
         <p id="textoFinal"></p>
         <p id="tempoFinal"></p>
-        <button class="botao" id="denovo">Jogar de novo</button>
+        <div class="botoes-final">
+          <button class="botao" id="denovo">Jogar de novo</button>
+          <button class="botao botao--secundario" id="mudarNivel">Mudar de nível</button>
+        </div>
       </div>
 
     </section>
@@ -223,11 +257,13 @@
     // Quantas perguntas de cada assunto (total: 10)
     const QUANTAS = { equacao: 4, potencia: 3, raiz: 3 };
     const TOTAL_PERGUNTAS = 10;
+    const NOMES_DOS_NIVEIS = { facil: "Fácil", medio: "Médio", dificil: "Difícil" };
 
     // ===== Elementos da página =====
     const el = (id) => document.getElementById(id);
 
     // ===== Estado do jogo (fica só na memória da página) =====
+    let nivel = "medio";     // nível escolhido na tela inicial
     let perguntas = [];
     let rodada = 0;
     let acertos = 0;
@@ -289,12 +325,18 @@
     }
 
     // ===== Perguntas de EQUAÇÃO DO 1º GRAU =====
+    // Cada gerador olha a variável "nivel" para escolher o tamanho dos números.
 
     // ax + b = c
     function equacaoSimples() {
-      const a = sortear(2, 9);
-      const x = sortear(-9, 12);
-      let b = sortear(-20, 20);
+      let a, x, b;
+      if (nivel === "facil") {          // tudo positivo e pequeno
+        a = sortear(2, 5); x = sortear(1, 10); b = sortear(1, 20);
+      } else if (nivel === "medio") {
+        a = sortear(2, 9); x = sortear(-9, 12); b = sortear(-20, 20);
+      } else {                          // números maiores e negativos
+        a = sortear(2, 12); x = sortear(-15, 15); b = sortear(-40, 40);
+      }
       if (b === 0) b = 7;
       const c = a * x + b;
       return {
@@ -311,9 +353,12 @@
 
     // a(x + b) = c
     function equacaoParenteses() {
-      const a = sortear(2, 6);
-      const x = sortear(-6, 10);
-      let b = sortear(-8, 9);
+      let a, x, b;
+      if (nivel === "dificil") {
+        a = sortear(2, 9); x = sortear(-10, 12); b = sortear(-12, 12);
+      } else {
+        a = sortear(2, 6); x = sortear(-6, 10); b = sortear(-8, 9);
+      }
       if (b === 0) b = 3;
       const c = a * (x + b);
       return {
@@ -330,10 +375,13 @@
 
     // ax + b = cx + d
     function equacaoDoisLados() {
-      const a = sortear(3, 9);
+      let a, x, b;
+      if (nivel === "dificil") {
+        a = sortear(4, 12); x = sortear(-12, 12); b = sortear(-30, 30);
+      } else {
+        a = sortear(3, 9); x = sortear(-8, 10); b = sortear(-15, 15);
+      }
       const c = sortear(1, a - 1);
-      const x = sortear(-8, 10);
-      let b = sortear(-15, 15);
       if (b === 0) b = -4;
       const d = (a - c) * x + b;
       return {
@@ -352,11 +400,24 @@
 
     // Calcule a potência: 3⁴, (−2)³, 7⁰...
     function potenciaValor() {
-      const opcoes = [
-        [2, sortear(2, 8)], [3, sortear(2, 4)], [4, sortear(2, 3)], [5, sortear(2, 3)],
-        [10, sortear(2, 5)], [-2, sortear(2, 5)], [-3, sortear(2, 3)], [sortear(6, 12), 2],
-        [sortear(2, 9), 0], [-1, sortear(5, 8)],
-      ];
+      let opcoes;
+      if (nivel === "facil") {
+        opcoes = [
+          [2, sortear(2, 5)], [3, sortear(2, 3)], [4, 2], [5, sortear(2, 3)],
+          [10, sortear(2, 3)], [sortear(6, 10), 2],
+        ];
+      } else if (nivel === "medio") {
+        opcoes = [
+          [2, sortear(2, 8)], [3, sortear(2, 4)], [4, sortear(2, 3)], [5, sortear(2, 3)],
+          [10, sortear(2, 5)], [-2, sortear(2, 5)], [-3, sortear(2, 3)], [sortear(6, 12), 2],
+          [sortear(2, 9), 0], [-1, sortear(5, 8)],
+        ];
+      } else {
+        opcoes = [
+          [-2, sortear(3, 6)], [-3, sortear(3, 4)], [-4, 3], [-5, 3], [2, sortear(7, 10)],
+          [3, sortear(4, 5)], [sortear(-9, -2), 0], [sortear(11, 15), 2],
+        ];
+      }
       const [base, exp] = umDe(opcoes);
       const resp = Math.pow(base, exp);
       let explicacao;
@@ -382,12 +443,49 @@
       };
     }
 
-    // Propriedades: 2⁵ · 2³ = 2^? ou 5⁷ ÷ 5³ = 5^?
+    // Pegadinha do sinal (Difícil): −2⁴ é diferente de (−2)⁴
+    function potenciaSinal() {
+      const a = sortear(2, 5);
+      const exp = umDe([2, 4]);
+      const valor = Math.pow(a, exp);
+      return {
+        assunto: "Potência",
+        pergunta: "Quanto vale esta conta? Cuidado com o sinal!",
+        conta: "−" + potencia(a, exp),
+        resposta: -valor,
+        erradas: [valor, -(a * exp), a * exp, -valor + 1],
+        explicacao:
+          `Sem parênteses, o expoente vale só para o ${a}: −${potencia(a, exp)} = −(${Array(exp).fill(a).join(" × ")}) = ${num(-valor)}. ` +
+          `Já ${potencia(-a, exp)} daria ${valor}.`,
+        confere: (r) => r === -valor,
+      };
+    }
+
+    // Propriedades: 2⁵ · 2³ = 2^?, 5⁷ ÷ 5³ = 5^? e, no Difícil, (3²)⁴ = 3^?
     function potenciaPropriedade() {
       const base = sortear(2, 9);
+      const tipos = nivel === "dificil" ? ["vezes", "dividir", "potencia"] : ["vezes", "dividir"];
+      const tipo = umDe(tipos);
+
+      if (tipo === "potencia") {
+        const m = sortear(2, 5);
+        const n = sortear(2, 4);
+        const resp = m * n;
+        return {
+          assunto: "Potência",
+          pergunta: "Qual expoente completa a conta?",
+          conta: "(" + potencia(base, m) + ")<sup>" + n + "</sup> = " + base + "<sup>?</sup>",
+          resposta: resp,
+          erradas: [m + n, resp + 1, resp - 1, Math.pow(m, n)],
+          mostrar: (v) => base + "<sup>" + v + "</sup>",
+          explicacao: `Potência de potência: conserve a base e multiplique os expoentes. ${m} × ${n} = ${resp}.`,
+          confere: (r) => r === m * n,
+        };
+      }
+
       const m = sortear(3, 9);
       const n = sortear(2, m - 1);
-      const multiplicar = Math.random() < 0.5;
+      const multiplicar = tipo === "vezes";
       const resp = multiplicar ? m + n : m - n;
       return {
         assunto: "Potência",
@@ -407,7 +505,7 @@
 
     // Raiz quadrada exata: √144
     function raizQuadrada() {
-      const r = sortear(2, 20);
+      const r = nivel === "facil" ? sortear(2, 10) : nivel === "medio" ? sortear(2, 20) : sortear(11, 30);
       const n = r * r;
       return {
         assunto: "Raiz",
@@ -420,9 +518,9 @@
       };
     }
 
-    // Raiz cúbica exata (pode ser negativa): ∛−27
+    // Raiz cúbica exata (no Médio e no Difícil pode ser negativa): ∛−27
     function raizCubica() {
-      let r = sortear(-6, 10);
+      let r = nivel === "facil" ? sortear(2, 5) : nivel === "medio" ? sortear(-6, 10) : sortear(-10, 12);
       if (r === 0 || r === 1) r = 4;
       const n = r * r * r;
       return {
@@ -437,10 +535,28 @@
     }
 
     // Soma de raízes: √36 + √64 (cuidado: não é √100!)
+    // No Difícil: √a + √b − √c
     function raizSoma() {
       let a = sortear(2, 12);
       let b = sortear(2, 12);
       if (a === b) b = a + 1;
+
+      if (nivel === "dificil") {
+        let c = sortear(2, 15);
+        if (c === a || c === b) c = Math.max(a, b) + 1;
+        const resp = a + b - c;
+        return {
+          assunto: "Raiz",
+          pergunta: "Quanto dá esta conta?",
+          conta: raiz(a * a, 2) + " + " + raiz(b * b, 2) + " − " + raiz(c * c, 2),
+          resposta: resp,
+          erradas: [a + b + c, resp + 1, resp - 2, -resp, c - a - b + 2],
+          explicacao:
+            `Calcule cada raiz primeiro: ${a}, ${b} e ${c}. Depois faça a conta: ${a} + ${b} − ${c} = ${num(resp)}.`,
+          confere: (v) => v === a + b - c,
+        };
+      }
+
       const resp = a + b;
       const errada = Math.sqrt(a * a + b * b); // erro comum: juntar tudo dentro da raiz
       return {
@@ -458,16 +574,37 @@
 
     // ===== Montar a partida =====
 
+    // Quais tipos de pergunta entram em cada nível
+    const TIPOS_POR_NIVEL = {
+      facil: {
+        equacao: [equacaoSimples],
+        potencia: [potenciaValor],
+        raiz: [raizQuadrada, raizQuadrada, raizCubica],
+      },
+      medio: {
+        equacao: [equacaoSimples, equacaoParenteses, equacaoDoisLados],
+        potencia: [potenciaValor, potenciaValor, potenciaPropriedade],
+        raiz: [raizQuadrada, raizCubica, raizSoma],
+      },
+      dificil: {
+        equacao: [equacaoSimples, equacaoParenteses, equacaoDoisLados, equacaoDoisLados],
+        potencia: [potenciaValor, potenciaSinal, potenciaPropriedade],
+        raiz: [raizQuadrada, raizCubica, raizSoma],
+      },
+    };
+
     function montarPartida() {
+      const tipos = TIPOS_POR_NIVEL[nivel];
       const lista = [];
-      for (let i = 0; i < QUANTAS.equacao; i++) {
-        lista.push(umDe([equacaoSimples, equacaoParenteses, equacaoDoisLados])());
-      }
-      for (let i = 0; i < QUANTAS.potencia; i++) {
-        lista.push(umDe([potenciaValor, potenciaValor, potenciaPropriedade])());
-      }
-      for (let i = 0; i < QUANTAS.raiz; i++) {
-        lista.push(umDe([raizQuadrada, raizCubica, raizSoma])());
+      for (const assunto of ["equacao", "potencia", "raiz"]) {
+        for (let i = 0; i < QUANTAS[assunto]; i++) {
+          // Sorteia de novo se a conta já apareceu nesta partida
+          let pergunta = umDe(tipos[assunto])();
+          for (let tentativa = 0; tentativa < 30 && lista.some((q) => q.conta === pergunta.conta); tentativa++) {
+            pergunta = umDe(tipos[assunto])();
+          }
+          lista.push(pergunta);
+        }
       }
       return embaralhar(lista);
     }
@@ -542,7 +679,7 @@
       inicioPergunta = Date.now();
       const p = perguntas[rodada - 1];
 
-      el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS}`;
+      el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS} · Nível ${NOMES_DOS_NIVEIS[nivel]}`;
       el("assunto").textContent = p.assunto;
       el("pergunta").textContent = p.pergunta;
       el("conta").innerHTML = p.conta;
@@ -605,7 +742,7 @@
       el("tituloFinal").textContent =
         acertos >= 8 ? "Que jogada!" : acertos >= 5 ? "Mandou bem!" : "Bora treinar mais!";
       el("textoFinal").innerHTML =
-        `Você fez <strong>${pontos} pontos</strong> e acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira.`;
+        `Nível ${NOMES_DOS_NIVEIS[nivel]}: você fez <strong>${pontos} pontos</strong> e acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira.`;
       const min = Math.floor(segundos / 60);
       const seg = segundos % 60;
       el("tempoFinal").textContent =
@@ -626,8 +763,19 @@
       novaRodada();
     }
 
-    el("comecar").addEventListener("click", comecar);
+    // Botões de nível: guardam o nível escolhido e começam o jogo
+    document.querySelectorAll(".nivel").forEach((botao) => {
+      botao.addEventListener("click", () => {
+        nivel = botao.dataset.nivel;
+        comecar();
+      });
+    });
+
     el("denovo").addEventListener("click", comecar);
+    el("mudarNivel").addEventListener("click", () => {
+      el("telaFinal").hidden = true;
+      el("telaInicio").hidden = false;
+    });
     el("proxima").addEventListener("click", () => {
       if (rodada < TOTAL_PERGUNTAS) novaRodada();
       else mostrarFinal();

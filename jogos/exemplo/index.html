@@ -6,16 +6,23 @@
   <!-- Pede aos sites de busca (Google etc.) para não listar esta página -->
   <meta name="robots" content="noindex, nofollow">
   <title>Desafio da Porcentagem · Fliperama da Matemática</title>
-  <!-- Visual comum a todos os jogos (cores, cabeçalho e botões) -->
+  <!-- Visual comum a todos os jogos (cores, cabeçalho, botões e níveis) -->
   <link rel="stylesheet" href="../../estilo-comum.css">
   <style>
     /* ===== Estilo só deste jogo ===== */
 
+    /* Com grade: pergunta à esquerda e grade à direita */
     .jogo {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
       gap: 2rem 3rem;
       align-items: start;
+    }
+
+    /* Sem grade: só a pergunta, centralizada */
+    .jogo.sem-grade {
+      grid-template-columns: minmax(0, 46rem);
+      justify-content: center;
     }
 
     .jogo__topo {
@@ -31,6 +38,12 @@
       margin: 0;
       font-weight: 800;
       font-size: 1.1rem;
+    }
+
+    .jogo__placares {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
     }
 
     .pergunta {
@@ -89,17 +102,6 @@
     }
 
     /* Grade de 100 quadradinhos: cada um vale 1% */
-    .jogo__placares {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .final {
-      max-width: 40rem;
-      margin: 0 auto;
-    }
-
     .grade {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
@@ -125,23 +127,39 @@
       text-align: center;
     }
 
-    /* Tela final */
-    .final {
+    /* Tela inicial e tela final */
+    .tela-centro {
       text-align: center;
       display: grid;
+      grid-template-columns: minmax(0, 1fr); /* não deixa passar da largura da tela */
       gap: 1rem;
       justify-items: center;
       padding-block: 2rem;
+      max-width: 44rem;
+      margin: 0 auto;
     }
 
-    .final h2 {
+    .tela-centro h2 {
       font-size: clamp(2rem, 6vw, 3.4rem);
       font-weight: 900;
     }
 
-    .final p {
+    .tela-centro p {
       margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .tela-centro .subtitulo {
+      margin-top: 0.75rem;
       font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .botoes-final {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
     }
 
     [hidden] {
@@ -174,12 +192,29 @@
   <main class="pagina-jogo">
     <section class="area-jogo">
 
-      <!-- Tela inicial -->
-      <div class="final" id="telaInicio">
+      <!-- Tela inicial: escolha do nível -->
+      <div class="tela-centro" id="telaInicio">
         <h2>Pronto para o desafio?</h2>
-        <p>São 10 perguntas de <strong>porcentagem</strong>. O cronômetro começa quando você apertar o botão.</p>
+        <p>São 10 perguntas de <strong>porcentagem</strong>. O cronômetro começa quando você escolher o nível.</p>
         <p>Acerto de primeira vale <strong>100 pontos</strong>, acerto depois de errar vale <strong>50</strong>. Quem responde rápido ganha <strong>até 50 de bônus</strong>!</p>
-        <button class="botao" id="comecar">Começar</button>
+        <p class="subtitulo">Escolha o nível:</p>
+        <div class="niveis">
+          <button class="nivel" data-nivel="facil">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span></span><span></span></span>
+            <span class="nivel__nome">Fácil</span>
+            <span class="nivel__descricao">10%, 25% e 50% de números redondos. Contar a grade.</span>
+          </button>
+          <button class="nivel" data-nivel="medio">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span></span></span>
+            <span class="nivel__nome">Médio</span>
+            <span class="nivel__descricao">Mais porcentagens, como 5%, 30% e 75%.</span>
+          </button>
+          <button class="nivel" data-nivel="dificil">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span class="cheia"></span></span>
+            <span class="nivel__nome">Difícil</span>
+            <span class="nivel__descricao">Descontos, aumentos e "quantos por cento".</span>
+          </button>
+        </div>
       </div>
 
       <!-- Tela do jogo -->
@@ -204,18 +239,22 @@
           <button class="botao" id="proxima" hidden>Próxima pergunta</button>
         </div>
 
-        <div class="jogo__grade">
+        <!-- A grade só aparece nas perguntas de contar quadradinhos -->
+        <div class="jogo__grade" id="blocoGrade">
           <div class="grade" id="grade" role="img"></div>
-          <p class="grade__legenda" id="legenda">Cada quadradinho vale 1%</p>
+          <p class="grade__legenda">Cada quadradinho vale 1%</p>
         </div>
       </div>
 
       <!-- Tela final -->
-      <div class="final" id="telaFinal" hidden>
+      <div class="tela-centro" id="telaFinal" hidden>
         <h2 id="tituloFinal"></h2>
         <p id="textoFinal"></p>
         <p id="tempoFinal"></p>
-        <button class="botao" id="denovo">Jogar de novo</button>
+        <div class="botoes-final">
+          <button class="botao" id="denovo">Jogar de novo</button>
+          <button class="botao botao--secundario" id="mudarNivel">Mudar de nível</button>
+        </div>
       </div>
 
     </section>
@@ -224,15 +263,14 @@
   <script>
     // ===== Configuração =====
     const TOTAL_PERGUNTAS = 10;
-
-    // Porcentagens usadas no jogo e os números que dão conta exata com cada uma
-    const PORCENTAGENS = [10, 20, 25, 50, 75, 5, 30, 40, 60, 90];
+    const NOMES_DOS_NIVEIS = { facil: "Fácil", medio: "Médio", dificil: "Difícil" };
 
     // ===== Elementos da página =====
     const el = (id) => document.getElementById(id);
     const grade = el("grade");
 
     // ===== Estado do jogo (fica só na memória da página) =====
+    let nivel = "medio";     // nível escolhido na tela inicial
     let rodada = 0;
     let acertos = 0;
     let errouNestaRodada = false;
@@ -241,15 +279,23 @@
     let inicio = 0;          // hora em que o jogo começou
     let inicioPergunta = 0;  // hora em que a pergunta apareceu
     let cronometro = null;   // o relógio que atualiza a tela
+    let jaSaiu = [];         // perguntas que já apareceram nesta partida
 
     // Cria os 100 quadradinhos da grade uma vez só
     for (let i = 0; i < 100; i++) {
       grade.appendChild(document.createElement("span"));
     }
 
+    // ===== Ajudantes =====
+
     // Número inteiro sorteado entre min e max
     function sortear(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Sorteia um item de uma lista
+    function umDe(lista) {
+      return lista[sortear(0, lista.length - 1)];
     }
 
     // Embaralha uma lista
@@ -260,56 +306,32 @@
         .map((par) => par[1]);
     }
 
+    // Máximo divisor comum (ajuda a achar números com conta exata)
+    function mdc(a, b) {
+      return b === 0 ? a : mdc(b, a % b);
+    }
+
+    // Mínimo múltiplo comum
+    function mmc(a, b) {
+      return (a * b) / mdc(a, b);
+    }
+
+    // Menor número que deixa "p% de n" exato: n precisa ser múltiplo dele
+    function passoExato(p) {
+      return 100 / mdc(p, 100);
+    }
+
+    // Escreve dinheiro: R$ 120
+    function reais(v) {
+      return "R$ " + v;
+    }
+
     // Pinta "quantos" quadradinhos da grade
     function pintarGrade(quantos) {
       grade.querySelectorAll("span").forEach((q, i) => {
         q.classList.toggle("pintado", i < quantos);
       });
       grade.setAttribute("aria-label", quantos + " de 100 quadradinhos pintados");
-    }
-
-    // ----- Tipo 1: "Quanto é 25% de 80?" -----
-    function perguntaDeValor() {
-      const p = PORCENTAGENS[sortear(0, PORCENTAGENS.length - 1)];
-      // Escolhe um número que deixa a conta exata (resultado inteiro)
-      const passo = 100 / mdc(p, 100);
-      const n = passo * sortear(1, Math.max(1, Math.floor(200 / passo)));
-      const resposta = (p * n) / 100;
-
-      // Respostas erradas parecidas com erros comuns
-      const erradas = [
-        (p * n) / 10,     // esqueceu um zero
-        n - resposta,     // calculou o que sobra
-        resposta + passo,  // conta perto
-        resposta * 2,
-        Math.max(1, resposta - 5),
-        resposta + 10,
-      ];
-
-      return {
-        texto: `Quanto é <strong>${p}%</strong> de <strong>${n}</strong>?`,
-        resposta,
-        erradas,
-        pintar: p,
-        legenda: `${p}% são ${p} quadradinhos de 100`,
-        explicacao: `${p}% de ${n} = ${p} × ${n} ÷ 100 = ${resposta}.` + dica(p, n),
-        sufixo: "",
-      };
-    }
-
-    // ----- Tipo 2: "Que porcentagem da grade está pintada?" -----
-    function perguntaDaGrade() {
-      const k = sortear(1, 19) * 5; // 5%, 10%, 15%... até 95%
-      const erradas = [100 - k, k + 10, k - 10, k + 5, k - 5, k / 5];
-      return {
-        texto: "Que porcentagem da grade está <strong>pintada</strong>?",
-        resposta: k,
-        erradas,
-        pintar: k,
-        legenda: "Conte os quadradinhos amarelos",
-        explicacao: `São ${k} quadradinhos pintados de 100. Então ${k}% da grade está pintada.`,
-        sufixo: "%",
-      };
     }
 
     // Dicas de atalho para algumas porcentagens
@@ -319,13 +341,123 @@
       if (p === 10) return ` Atalho: 10% é dividir por 10, ${n} ÷ 10.`;
       if (p === 75) return ` Atalho: 75% são três quartos, ${n} ÷ 4 × 3.`;
       if (p === 20) return ` Atalho: 20% é um quinto, ${n} ÷ 5.`;
-      if (p === 5) return ` Atalho: 5% é a metade de 10%.`;
+      if (p === 5) return " Atalho: 5% é a metade de 10%.";
+      if (p === 1) return ` Atalho: 1% é dividir por 100, ${n} ÷ 100.`;
+      if (p === 2) return " Atalho: 2% é o dobro de 1%.";
+      if (p === 15) return " Atalho: 15% é 10% mais 5%.";
+      if (p === 45) return " Atalho: 45% é 50% menos 5%.";
+      if (p === 80) return " Atalho: 80% é o total menos 20%.";
       return "";
     }
 
-    // Máximo divisor comum (ajuda a achar números com conta exata)
-    function mdc(a, b) {
-      return b === 0 ? a : mdc(b, a % b);
+    // ===== Tipos de pergunta =====
+
+    // ----- "Quanto é 25% de 80?" -----
+    function perguntaDeValor() {
+      let p, n;
+      if (nivel === "facil") {
+        p = umDe([10, 25, 50]);
+        n = 20 * sortear(1, 5);                    // 20, 40, 60, 80 ou 100
+      } else if (nivel === "medio") {
+        p = umDe([5, 10, 20, 25, 30, 40, 50, 60, 75, 90]);
+        const passo = passoExato(p);
+        n = passo * sortear(1, Math.max(1, Math.floor(200 / passo)));
+      } else {
+        p = umDe([1, 2, 12, 15, 35, 45, 65, 80]);
+        const passo = passoExato(p);
+        n = passo * sortear(Math.ceil(100 / passo), Math.floor(400 / passo));
+      }
+      const resposta = (p * n) / 100;
+      return {
+        texto: `Quanto é <strong>${p}%</strong> de <strong>${n}</strong>?`,
+        resposta,
+        // Respostas erradas parecidas com erros comuns
+        erradas: [(p * n) / 10, n - resposta, resposta + passoExato(p), resposta * 2, resposta - 5, resposta + 10],
+        explicacao: `${p}% de ${n} = ${p} × ${n} ÷ 100 = ${resposta}.` + dica(p, n),
+      };
+    }
+
+    // ----- "Que porcentagem da grade está pintada?" -----
+    function perguntaDaGrade() {
+      let k;
+      if (nivel === "facil") k = sortear(1, 9) * 10;        // 10%, 20%... 90%
+      else if (nivel === "medio") k = sortear(1, 19) * 5;   // 5%, 10%... 95%
+      else k = sortear(1, 99);                              // qualquer um
+      return {
+        texto: "Que porcentagem da grade está <strong>pintada</strong>?",
+        resposta: k,
+        erradas: [100 - k, k + 10, k - 10, k + 5, k - 5, k + 1, k - 1],
+        grade: k,
+        formatar: (v) => v + "%",
+        explicacao: `São ${k} quadradinhos pintados de 100. Então ${k}% da grade está pintada.`,
+      };
+    }
+
+    // ----- Desconto: "Um tênis custa R$ 200 e tem 25% de desconto..." -----
+    function perguntaDeDesconto() {
+      const p = umDe([10, 20, 25, 30, 40, 50]);
+      const passo = mmc(10, passoExato(p)); // preço redondo e conta exata
+      const preco = passo * sortear(Math.ceil(40 / passo), Math.floor(300 / passo));
+      const desconto = (p * preco) / 100;
+      const resposta = preco - desconto;
+      const coisa = umDe(["Um tênis", "Uma mochila", "Um jogo de videogame", "Uma bola"]);
+      return {
+        texto: `${coisa} custa <strong>${reais(preco)}</strong> e está com <strong>${p}%</strong> de desconto. Quanto fica?`,
+        resposta,
+        erradas: [desconto, preco - p, preco + desconto, resposta - 10, resposta + 10],
+        formatar: reais,
+        explicacao: `Desconto: ${p}% de ${preco} = ${desconto}. Preço final: ${preco} − ${desconto} = ${resposta} reais.`,
+      };
+    }
+
+    // ----- Aumento: "Uma passagem de R$ 80 aumentou 25%..." -----
+    function perguntaDeAumento() {
+      const p = umDe([10, 20, 25, 50]);
+      const passo = mmc(10, passoExato(p)); // preço redondo e conta exata
+      const preco = passo * sortear(Math.ceil(20 / passo), Math.floor(200 / passo));
+      const aumento = (p * preco) / 100;
+      const resposta = preco + aumento;
+      // Cada item com a palavra certa: "mais caro" ou "mais cara"
+      const [coisa, caro] = umDe([
+        ["Uma passagem de ônibus", "cara"], ["Um ingresso de cinema", "caro"],
+        ["Um lanche", "caro"], ["Uma camiseta", "cara"],
+      ]);
+      return {
+        texto: `${coisa} custava <strong>${reais(preco)}</strong> e ficou <strong>${p}%</strong> mais ${caro}. Qual é o novo preço?`,
+        resposta,
+        erradas: [aumento, preco + p, preco - aumento, resposta + 10, resposta - 5],
+        formatar: reais,
+        explicacao: `Aumento: ${p}% de ${preco} = ${aumento}. Novo preço: ${preco} + ${aumento} = ${resposta} reais.`,
+      };
+    }
+
+    // ----- "15 é quantos por cento de 60?" -----
+    function perguntaQuantosPorCento() {
+      const p = umDe([5, 10, 20, 25, 40, 50, 75]);
+      const passo = passoExato(p);
+      const total = passo * sortear(Math.max(1, Math.ceil(20 / passo)), Math.floor(200 / passo));
+      const parte = (p * total) / 100;
+      const decimal = (p / 100).toLocaleString("pt-BR");
+      return {
+        texto: `<strong>${parte}</strong> é quantos por cento de <strong>${total}</strong>?`,
+        resposta: p,
+        erradas: [parte, 100 - p, p + 5, p - 5, p * 2],
+        formatar: (v) => v + "%",
+        explicacao: `${parte} ÷ ${total} = ${decimal}, e ${decimal} × 100 = ${p}. Então ${parte} é ${p}% de ${total}.`,
+      };
+    }
+
+    // Sorteia o tipo de pergunta conforme o nível
+    function sortearPergunta() {
+      const r = Math.random();
+      if (nivel === "facil") return r < 0.5 ? perguntaDeValor() : perguntaDaGrade();
+      if (nivel === "medio") return r < 0.6 ? perguntaDeValor() : perguntaDaGrade();
+      // Difícil
+      if (r < 0.3) return perguntaDeValor();
+      if (r < 0.45) return perguntaDeDesconto();
+      if (r < 0.6) return perguntaDeAumento();
+      if (r < 0.8) return perguntaQuantosPorCento();
+      return perguntaDaGrade();
     }
 
     // Monta as 4 opções: a certa + 3 erradas diferentes e positivas
@@ -395,24 +527,34 @@
       rodada++;
       errouNestaRodada = false;
       inicioPergunta = Date.now();
-      perguntaAtual = Math.random() < 0.6 ? perguntaDeValor() : perguntaDaGrade();
+      // Sorteia de novo se a pergunta já apareceu nesta partida
+      perguntaAtual = sortearPergunta();
+      for (let tentativa = 0; tentativa < 30 && jaSaiu.includes(perguntaAtual.texto + perguntaAtual.grade); tentativa++) {
+        perguntaAtual = sortearPergunta();
+      }
+      jaSaiu.push(perguntaAtual.texto + perguntaAtual.grade);
 
-      el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS}`;
+      el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS} · Nível ${NOMES_DOS_NIVEIS[nivel]}`;
       el("pergunta").innerHTML = perguntaAtual.texto;
-      el("legenda").textContent = perguntaAtual.legenda;
-      pintarGrade(perguntaAtual.pintar);
+
+      // A grade só aparece quando a pergunta precisa dela
+      const temGrade = perguntaAtual.grade !== undefined;
+      el("blocoGrade").hidden = !temGrade;
+      el("telaJogo").classList.toggle("sem-grade", !temGrade);
+      if (temGrade) pintarGrade(perguntaAtual.grade);
 
       el("mensagem").hidden = true;
       el("explicacao").hidden = true;
       el("proxima").hidden = true;
 
       // Cria os botões de resposta
+      const formatar = perguntaAtual.formatar || String;
       const opcoes = el("opcoes");
       opcoes.innerHTML = "";
       montarOpcoes(perguntaAtual.resposta, perguntaAtual.erradas).forEach((valor) => {
         const botao = document.createElement("button");
         botao.className = "botao opcao";
-        botao.textContent = valor + perguntaAtual.sufixo;
+        botao.textContent = formatar(valor);
         botao.addEventListener("click", () => responder(botao, valor));
         opcoes.appendChild(botao);
       });
@@ -461,7 +603,7 @@
       el("tituloFinal").textContent =
         acertos >= 8 ? "Que jogada!" : acertos >= 5 ? "Mandou bem!" : "Bora treinar mais!";
       el("textoFinal").innerHTML =
-        `Você fez <strong>${pontos} pontos</strong> e acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira. Isso é ${porcento}% de acerto!`;
+        `Nível ${NOMES_DOS_NIVEIS[nivel]}: você fez <strong>${pontos} pontos</strong> e acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira. Isso é ${porcento}% de acerto!`;
       const min = Math.floor(segundos / 60);
       const seg = segundos % 60;
       el("tempoFinal").textContent =
@@ -470,6 +612,7 @@
     }
 
     function comecar() {
+      jaSaiu = [];
       rodada = 0;
       acertos = 0;
       pontos = 0;
@@ -481,12 +624,23 @@
       novaRodada();
     }
 
+    // Botões de nível: guardam o nível escolhido e começam o jogo
+    document.querySelectorAll(".nivel").forEach((botao) => {
+      botao.addEventListener("click", () => {
+        nivel = botao.dataset.nivel;
+        comecar();
+      });
+    });
+
     el("proxima").addEventListener("click", () => {
       if (rodada < TOTAL_PERGUNTAS) novaRodada();
       else mostrarFinal();
     });
-    el("comecar").addEventListener("click", comecar);
     el("denovo").addEventListener("click", comecar);
+    el("mudarNivel").addEventListener("click", () => {
+      el("telaFinal").hidden = true;
+      el("telaInicio").hidden = false;
+    });
   </script>
 </body>
 </html>
