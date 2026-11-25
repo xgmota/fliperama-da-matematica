@@ -106,7 +106,8 @@
 
     /* Resposta certa e resposta errada (com palavras na mensagem também) */
     .opcao--certa,
-    .opcao--certa:hover {
+    .opcao--certa:hover,
+    .opcao--certa:disabled {
       background: var(--acerto-fundo);
       box-shadow: inset 0 0 0 4px var(--acerto-linha);
       color: var(--acerto-texto);
@@ -114,7 +115,8 @@
     }
 
     .opcao--errada,
-    .opcao--errada:hover {
+    .opcao--errada:hover,
+    .opcao--errada:disabled {
       background: var(--erro-fundo);
       box-shadow: inset 0 0 0 4px var(--erro-linha);
       color: var(--erro-texto);
@@ -177,6 +179,7 @@
       <div class="tela-centro" id="telaInicio">
         <h2>Pronto para o desafio?</h2>
         <p>São 10 perguntas de <strong>equações do 1º grau</strong>, <strong>potenciação</strong> e <strong>radiciação</strong>. O cronômetro começa quando você apertar o botão.</p>
+        <p>Acerto de primeira vale <strong>100 pontos</strong>, acerto depois de errar vale <strong>50</strong>. Quem responde rápido ganha <strong>até 50 de bônus</strong>!</p>
         <button class="botao" id="comecar">Começar</button>
       </div>
 
@@ -185,7 +188,7 @@
         <div class="jogo__topo">
           <p class="jogo__rodada"><span id="rodada">Pergunta 1 de 10</span><span class="assunto" id="assunto"></span></p>
           <div class="jogo__placares">
-            <div class="placar">Acertos <span class="placar__valor" id="placar">0</span></div>
+            <div class="placar">Pontos <span class="placar__valor" id="placar">0</span></div>
             <div class="placar">Tempo <span class="placar__valor" id="relogio">0:00</span></div>
           </div>
         </div>
@@ -229,6 +232,8 @@
     let errouNestaRodada = false;
     let inicio = 0;          // hora em que o jogo começou
     let cronometro = null;   // o relógio que atualiza a tela
+    let pontos = 0;
+    let inicioPergunta = 0;  // hora em que a pergunta apareceu
 
     // ===== Ajudantes =====
 
@@ -481,6 +486,27 @@
       return embaralhar([resposta, ...escolhidas]);
     }
 
+    // ===== Pontuação (igual em todos os jogos do Fliperama) =====
+    // Acerto de primeira: 100 pontos. Acerto depois de errar: 50 pontos.
+    // Bônus de rapidez: até +50, perdendo 1 ponto a cada segundo de demora.
+    const PONTOS_ACERTO_PRIMEIRA = 100;
+    const PONTOS_ACERTO_DEPOIS = 50;
+    const BONUS_MAXIMO = 50;
+    const BONUS_PERDE_POR_SEGUNDO = 1;
+
+    function calcularPontos(acertouDePrimeira, segundosNaPergunta) {
+      const base = acertouDePrimeira ? PONTOS_ACERTO_PRIMEIRA : PONTOS_ACERTO_DEPOIS;
+      const bonus = Math.max(0, BONUS_MAXIMO - BONUS_PERDE_POR_SEGUNDO * segundosNaPergunta);
+      return { base, bonus, total: base + bonus };
+    }
+
+    // Mensagem de acerto com os pontos ganhos
+    function mensagemDePontos(acertouDePrimeira, ganho) {
+      const inicio = acertouDePrimeira ? "Acertou! Na primeira!" : "Acertou! Agora foi.";
+      const detalhe = ganho.bonus > 0 ? ` (${ganho.base} + ${ganho.bonus} de rapidez)` : "";
+      return `${inicio} +${ganho.total} pontos${detalhe}.`;
+    }
+
     // ===== Cronômetro =====
 
     function tempoPassado() {
@@ -511,6 +537,7 @@
     function novaRodada() {
       rodada++;
       errouNestaRodada = false;
+      inicioPergunta = Date.now();
       const p = perguntas[rodada - 1];
 
       el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS}`;
@@ -541,13 +568,15 @@
 
       if (valor === p.resposta) {
         // Acertou!
-        if (!errouNestaRodada) {
-          acertos++;
-          el("placar").textContent = acertos;
-        }
+        const dePrimeira = !errouNestaRodada;
+        if (dePrimeira) acertos++;
+        const segundos = Math.floor((Date.now() - inicioPergunta) / 1000);
+        const ganho = calcularPontos(dePrimeira, segundos);
+        pontos += ganho.total;
+        el("placar").textContent = pontos;
         botao.classList.add("opcao--certa");
         mensagem.className = "mensagem mensagem--acerto";
-        mensagem.textContent = errouNestaRodada ? "Acertou! Agora foi." : "Acertou! Na primeira!";
+        mensagem.textContent = mensagemDePontos(dePrimeira, ganho);
         el("explicacao").innerHTML = p.explicacao;
         el("explicacao").hidden = false;
 
@@ -573,7 +602,8 @@
       el("telaFinal").hidden = false;
       el("tituloFinal").textContent =
         acertos >= 8 ? "Que jogada!" : acertos >= 5 ? "Mandou bem!" : "Bora treinar mais!";
-      el("textoFinal").textContent = `Você acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira.`;
+      el("textoFinal").innerHTML =
+        `Você fez <strong>${pontos} pontos</strong> e acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira.`;
       const min = Math.floor(segundos / 60);
       const seg = segundos % 60;
       el("tempoFinal").textContent =
@@ -585,6 +615,7 @@
       perguntas = montarPartida();
       rodada = 0;
       acertos = 0;
+      pontos = 0;
       el("placar").textContent = "0";
       el("telaInicio").hidden = true;
       el("telaFinal").hidden = true;
