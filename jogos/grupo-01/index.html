@@ -5,98 +5,1046 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Pede aos sites de busca (Google etc.) para não listar esta página -->
   <meta name="robots" content="noindex, nofollow">
-  <title>Grupo 1 · Fliperama da Matemática</title>
-  <!-- Visual comum a todos os jogos (cores, cabeçalho e botões) -->
+  <title>Lanchonete das Frações · Fliperama da Matemática</title>
+  <!-- Visual comum a todos os jogos (cores, cabeçalho, botões e níveis) -->
   <link rel="stylesheet" href="../../estilo-comum.css">
   <style>
     /* ===== Estilo só deste jogo (Grupo 1) ===== */
 
-    .em-construcao {
+    /* Pergunta e respostas à esquerda, desenho da comida à direita */
+    .jogo {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+      grid-template-areas:
+        "topo     topo"
+        "pergunta desenho"
+        "respostas desenho";
+      grid-template-rows: auto auto 1fr;
+      gap: 1.5rem 3rem;
+      align-items: start;
+    }
+
+    .jogo__topo {
+      grid-area: topo;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
       align-items: center;
-      gap: 2rem;
+      justify-content: space-between;
     }
 
-    .em-construcao__texto {
-      display: grid;
-      gap: 1rem;
-      max-width: 36rem;
-    }
-
-    .em-construcao h2 {
-      font-size: clamp(1.7rem, 4vw, 2.6rem);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-    }
-
-    .em-construcao p {
+    .jogo__rodada {
       margin: 0;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .jogo__placares {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .pergunta {
+      grid-area: pergunta;
+      margin: 0;
+      font-size: clamp(1.45rem, 3.4vw, 2.1rem);
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+
+    .pergunta strong {
+      color: var(--azul-quadra);
+    }
+
+    .jogo__respostas {
+      grid-area: respostas;
+    }
+
+    /* Fração "em pé": numerador em cima, denominador embaixo */
+    .fracao {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      line-height: 1.05;
+      margin: 0 0.12em;
+      font-weight: 900;
+    }
+
+    .fracao__num {
+      padding: 0 0.15em 0.05em;
+      border-bottom: 0.09em solid currentColor;
+    }
+
+    .fracao__den {
+      padding: 0.05em 0.15em 0;
+    }
+
+    /* As 4 respostas */
+    .opcoes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .opcao {
+      min-height: 5rem;
+      font-size: 1.6rem;
+      background: var(--branco);
+      color: var(--texto-escuro);
+      box-shadow: inset 0 0 0 3px var(--azul-quadra), 0 4px 10px rgb(0 0 0 / 0.12);
+    }
+
+    .opcao:hover {
+      background: var(--amarelo);
+    }
+
+    /* Resposta certa e resposta errada (com palavras na mensagem também) */
+    .opcao--certa,
+    .opcao--certa:hover,
+    .opcao--certa:disabled {
+      background: var(--acerto-fundo);
+      box-shadow: inset 0 0 0 4px var(--acerto-linha);
+      color: var(--acerto-texto);
+      opacity: 1;
+    }
+
+    .opcao--errada,
+    .opcao--errada:hover,
+    .opcao--errada:disabled {
+      background: var(--erro-fundo);
+      box-shadow: inset 0 0 0 4px var(--erro-linha);
+      color: var(--erro-texto);
+      text-decoration: line-through;
+      opacity: 1;
+    }
+
+    .explicacao {
+      margin: 0 0 1rem;
       font-size: 1.15rem;
+      line-height: 1.6;
     }
 
-    .em-construcao .botao {
-      justify-self: start;
+    /* Desenho da comida (pizza, chocolate ou prato) */
+    .jogo__desenho {
+      grid-area: desenho;
+      margin: 0;
+      display: grid;
+      justify-items: center;
+      gap: 0.75rem;
     }
 
-    /* Número do grupo pintado no chão */
-    .em-construcao .numero {
-      --cor-linha: var(--azul-garrafao);
-      height: clamp(7rem, 22vw, 13rem);
+    .jogo__desenho svg {
+      width: 100%;
+      max-height: 20rem;
     }
 
-    /* Faixa listrada de "obra" pintada na quadra */
-    .faixa-obra {
-      height: 1.5rem;
-      margin: 0 0 2rem;
-      border-radius: 4px;
-      background: repeating-linear-gradient(
-        -45deg,
-        var(--amarelo) 0 22px,
-        var(--azul-noite) 22px 44px
-      );
+    .jogo__desenho figcaption {
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.5;
     }
 
-    @media (max-width: 40rem) {
-      .em-construcao {
-        grid-template-columns: 1fr;
+    /* Vitrine de comidas na tela inicial */
+    .vitrine {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .vitrine svg {
+      height: 5.5rem;
+      width: auto;
+    }
+
+    /* Tela inicial e tela final */
+    .tela-centro {
+      text-align: center;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr); /* não deixa passar da largura da tela */
+      gap: 1rem;
+      justify-items: center;
+      padding-block: 2rem;
+      max-width: 52rem;
+      margin: 0 auto;
+    }
+
+    .tela-centro h2 {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-weight: 900;
+    }
+
+    .tela-centro p {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .tela-centro h3 {
+      margin-top: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+
+    .tela-centro .dica-ranking {
+      font-size: 1rem;
+    }
+
+    .tela-centro .regras {
+      margin-top: 0.5rem;
+      font-size: 1.05rem;
+    }
+
+    .botoes-final {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* Celular: pergunta, desenho e depois as respostas */
+    @media (max-width: 48rem) {
+      .jogo {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+          "topo"
+          "pergunta"
+          "desenho"
+          "respostas";
+        grid-template-rows: auto;
       }
-      .em-construcao .numero {
-        order: -1;
+      .jogo__desenho svg {
+        max-height: 15rem;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Desenho dos algarismos (usados nos números de camisa) -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <symbol id="d0" viewBox="0 0 60 100"><path d="M8 8 H52 V92 H8 Z"/></symbol>
-    <symbol id="d1" viewBox="0 0 60 100"><path d="M14 22 L30 8 V92"/></symbol>
-  </svg>
 
   <!-- Cabeçalho igual em todos os jogos -->
   <header class="cabecalho">
     <div class="cabecalho__dentro">
       <a class="botao botao--voltar" href="../../index.html">← Voltar ao início</a>
-      <h1 class="cabecalho__titulo">Jogo em construção</h1>
+      <h1 class="cabecalho__titulo">Lanchonete das Frações</h1>
       <p class="cabecalho__grupo">Feito pelo <strong>Grupo 1</strong></p>
     </div>
   </header>
 
   <main class="pagina-jogo">
-    <!-- Área do jogo: quando o grupo mandar o primeiro pedido, o jogo entra aqui -->
-    <section class="area-jogo" aria-labelledby="aviso">
-      <div class="faixa-obra" aria-hidden="true"></div>
-      <div class="em-construcao">
-        <div class="em-construcao__texto">
-          <h2 id="aviso">Este jogo ainda está em construção</h2>
-          <p>O Grupo 1 está treinando as jogadas. Logo, logo o jogo aparece aqui!</p>
-          <p>Enquanto isso, que tal jogar o jogo de outro grupo?</p>
-          <a class="botao" href="../../index.html">Ver os outros jogos</a>
+    <section class="area-jogo">
+
+      <!-- Tela inicial: escolha do nível -->
+      <div class="tela-centro" id="telaInicio">
+        <div class="vitrine" id="vitrine" aria-hidden="true"></div>
+        <h2>Bateu a fome de frações?</h2>
+        <p>10 perguntas de <strong>frações</strong> com pizza, chocolate e brigadeiro. Escolha o nível e o cronômetro começa na hora!</p>
+        <div class="niveis">
+          <button class="nivel nivel--facil" data-nivel="facil">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span></span><span></span></span>
+            <span class="nivel__nome">Fácil</span>
+            <span class="nivel__descricao">Que fração da pizza ou do chocolate foi comida?</span>
+          </button>
+          <button class="nivel nivel--medio" data-nivel="medio">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span></span></span>
+            <span class="nivel__nome">Médio</span>
+            <span class="nivel__descricao">Somar fatias, simplificar e fração de uma quantidade.</span>
+          </button>
+          <button class="nivel nivel--dificil" data-nivel="dificil">
+            <span class="nivel__barras" aria-hidden="true"><span class="cheia"></span><span class="cheia"></span><span class="cheia"></span></span>
+            <span class="nivel__nome">Difícil</span>
+            <span class="nivel__descricao">Somar frações com denominadores diferentes e ver o que sobrou.</span>
+          </button>
         </div>
-        <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 1"><use href="#d0" x="0" width="60" height="100"/><use href="#d1" x="76" width="60" height="100"/></svg>
+        <p class="regras">Acerto de primeira: 100 pontos · Depois de errar: 50 · Rapidez: até +50</p>
+        <button class="botao botao--secundario" id="verRanking">Ver ranking</button>
       </div>
+
+      <!-- Tela do ranking (com abas dos níveis) -->
+      <div class="tela-centro" id="telaRanking" hidden>
+        <h2>Ranking</h2>
+        <p>Os 10 melhores deste computador.</p>
+        <div class="abas" role="tablist" aria-label="Nível do ranking">
+          <button class="aba" role="tab" data-aba="facil" aria-selected="false">Fácil</button>
+          <button class="aba" role="tab" data-aba="medio" aria-selected="false">Médio</button>
+          <button class="aba" role="tab" data-aba="dificil" aria-selected="false">Difícil</button>
+        </div>
+        <div id="tabelaRanking"></div>
+        <button class="botao" id="voltarDoRanking">Voltar</button>
+      </div>
+
+      <!-- Tela do jogo -->
+      <div class="jogo" id="telaJogo" hidden>
+        <div class="jogo__topo">
+          <p class="jogo__rodada" id="rodada">Pergunta 1 de 10</p>
+          <div class="jogo__placares">
+            <div class="placar">Pontos <span class="placar__valor" id="placar">0</span></div>
+            <div class="placar">Tempo <span class="placar__valor" id="relogio">0:00</span></div>
+          </div>
+        </div>
+
+        <h2 class="pergunta" id="pergunta"></h2>
+
+        <!-- Desenho da comida: faz parte de todas as perguntas -->
+        <figure class="jogo__desenho">
+          <div id="desenho"></div>
+          <figcaption id="legenda"></figcaption>
+        </figure>
+
+        <div class="jogo__respostas">
+          <div class="opcoes" id="opcoes"></div>
+
+          <!-- Mensagem de acerto ou erro (o leitor de tela também lê) -->
+          <div aria-live="polite">
+            <p class="mensagem" id="mensagem" hidden></p>
+          </div>
+          <p class="explicacao" id="explicacao" hidden></p>
+          <button class="botao" id="proxima" hidden>Próxima pergunta</button>
+        </div>
+      </div>
+
+      <!-- Tela final -->
+      <div class="tela-centro" id="telaFinal" hidden>
+        <h2 id="tituloFinal"></h2>
+        <p id="textoFinal"></p>
+        <p id="tempoFinal"></p>
+
+        <!-- Entrar no ranking: só se o aluno quiser -->
+        <div class="caixa-ranking" id="caixaRanking">
+          <label for="nick">Quer entrar no ranking?</label>
+          <p class="dica-ranking">Só se quiser. Use o primeiro nome ou um apelido, sem sobrenome.</p>
+          <div class="caixa-ranking__linha" id="linhaRanking">
+            <input class="campo" id="nick" maxlength="20" autocomplete="off" placeholder="Nome ou apelido">
+            <button class="botao" id="salvarRanking">Salvar</button>
+            <button class="botao botao--secundario" id="pularRanking">Agora não</button>
+          </div>
+          <p class="mensagem" id="mensagemRanking" hidden></p>
+        </div>
+
+        <h3 id="tituloRankingFinal">Ranking</h3>
+        <div id="rankingFinal"></div>
+        <div class="botoes-final">
+          <button class="botao" id="denovo">Jogar de novo</button>
+          <button class="botao botao--secundario" id="mudarNivel">Mudar de nível</button>
+        </div>
+      </div>
+
     </section>
   </main>
+
+  <!-- Ranking guardado só neste computador (igual em todos os jogos) -->
+  <script src="../../ranking-comum.js"></script>
+  <script>
+    // ===== Configuração =====
+    const TOTAL_PERGUNTAS = 10;
+    const NOMES_DOS_NIVEIS = { facil: "Fácil", medio: "Médio", dificil: "Difícil" };
+
+    // Nome do jogo no ranking (cada jogo tem o seu)
+    const JOGO_ID = "grupo-01";
+    const NOME_DO_JOGO = "Lanchonete das Frações";
+
+    // ===== Elementos da página =====
+    const el = (id) => document.getElementById(id);
+
+    // ===== Estado do jogo (fica só na memória da página) =====
+    let nivel = "medio";     // nível escolhido na tela inicial
+    let rodada = 0;
+    let acertos = 0;
+    let errouNestaRodada = false;
+    let perguntaAtual = null;
+    let pontos = 0;
+    let tempoDaPartida = 0;  // tempo total da última partida (para o ranking)
+    let inicio = 0;          // hora em que o jogo começou
+    let inicioPergunta = 0;  // hora em que a pergunta apareceu
+    let cronometro = null;   // o relógio que atualiza a tela
+    let jaSaiu = [];         // perguntas que já apareceram nesta partida
+
+    // ===== Ajudantes =====
+
+    // Número inteiro sorteado entre min e max
+    function sortear(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Sorteia um item de uma lista
+    function umDe(lista) {
+      return lista[sortear(0, lista.length - 1)];
+    }
+
+    // Embaralha uma lista
+    function embaralhar(lista) {
+      return lista
+        .map((item) => [Math.random(), item])
+        .sort((a, b) => a[0] - b[0])
+        .map((par) => par[1]);
+    }
+
+    // Máximo divisor comum (para simplificar frações)
+    function mdc(a, b) {
+      return b === 0 ? a : mdc(b, a % b);
+    }
+
+    // Mínimo múltiplo comum (para somar frações com denominadores diferentes)
+    function mmc(a, b) {
+      return (a * b) / mdc(a, b);
+    }
+
+    // ===== Frações =====
+    // Uma fração é guardada como { n: numerador, d: denominador }.
+    // Respostas que são números inteiros ficam como número normal.
+
+    function F(n, d) {
+      return { n, d };
+    }
+
+    function ehFracao(v) {
+      return typeof v === "object";
+    }
+
+    // Valor da resposta (3/4 vira 0,75), para comparar frações equivalentes
+    function valorDe(v) {
+      return ehFracao(v) ? v.n / v.d : v;
+    }
+
+    function mesmoValor(a, b) {
+      return Math.abs(valorDe(a) - valorDe(b)) < 1e-9;
+    }
+
+    // Forma mais simples: 6/8 vira 3/4
+    function simplificar(n, d) {
+      const m = mdc(n, d);
+      return F(n / m, d / m);
+    }
+
+    // Desenha a fração "em pé" (o leitor de tela lê "3/4")
+    function fr(n, d) {
+      return `<span class="fracao"><span class="fracao__num" aria-hidden="true">${n}</span>` +
+        `<span class="fracao__den" aria-hidden="true">${d}</span><span class="so-leitor">${n}/${d}</span></span>`;
+    }
+
+    // Mostra uma resposta (fração ou número)
+    function mostrar(v) {
+      return ehFracao(v) ? fr(v.n, v.d) : String(v);
+    }
+
+    // Resposta escrita em texto simples, para a mensagem de erro
+    function emTexto(v) {
+      return ehFracao(v) ? v.n + "/" + v.d : String(v);
+    }
+
+    // Texto extra quando a fração pode ser simplificada
+    function seSimplifica(n, d) {
+      const s = simplificar(n, d);
+      return s.d !== d ? ` = ${fr(s.n, s.d)}` : "";
+    }
+
+    // Nomes inventados para as perguntas (iniciais diferentes)
+    const DUPLAS = [["Ana", "Beto"], ["Lia", "Caio"], ["Nina", "Theo"], ["Malu", "Davi"], ["Bia", "Rafa"]];
+
+    // ===== Desenhos das comidas (SVG feito aqui mesmo, sem internet) =====
+
+    // Cores das comidas (só nos desenhos)
+    const COR = {
+      prato: "#ffffff", bordaPrato: "#b9cdea",
+      massa: "#d98c2b", queijo: "#ffd34d", calabresa: "#d9432f", linhaPizza: "#8a5a1c",
+      vazio: "#f7efe1", tracejado: "#b8925a", letra: "#6b4a1f",
+      chocolate: "#6e3f22", chocolateBrilho: "#86522f", papel: "#efe3cf",
+    };
+
+    // Ponto na borda de um círculo com centro (100, 100)
+    function ponto(raio, graus) {
+      const rad = (graus * Math.PI) / 180;
+      return [(100 + raio * Math.cos(rad)).toFixed(2), (100 + raio * Math.sin(rad)).toFixed(2)];
+    }
+
+    // Caminho de uma fatia de pizza (de um ângulo até outro)
+    function caminhoFatia(raio, a0, a1) {
+      const [x0, y0] = ponto(raio, a0);
+      const [x1, y1] = ponto(raio, a1);
+      const grande = a1 - a0 > 180 ? 1 : 0;
+      return `M100 100 L${x0} ${y0} A${raio} ${raio} 0 ${grande} 1 ${x1} ${y1} Z`;
+    }
+
+    // Pizza com "partes" fatias. marcas[i]: null = fatia inteira,
+    // "" = fatia comida, "A" = fatia comida pela pessoa com inicial A
+    function desenharPizza(partes, marcas) {
+      let s = `<svg viewBox="0 0 200 200" aria-hidden="true">`;
+      s += `<circle cx="100" cy="100" r="97" fill="${COR.prato}" stroke="${COR.bordaPrato}" stroke-width="3"/>`;
+      const largura = 360 / partes;
+      for (let i = 0; i < partes; i++) {
+        const a0 = -90 + i * largura;
+        const a1 = a0 + largura;
+        const meio = (a0 + a1) / 2;
+        if (marcas[i] === null) {
+          // Fatia inteira: borda de massa, queijo e calabresas
+          s += `<path d="${caminhoFatia(88, a0, a1)}" fill="${COR.massa}"/>`;
+          s += `<path d="${caminhoFatia(76, a0, a1)}" fill="${COR.queijo}"/>`;
+          const lugares = [[52, meio]];
+          if (partes <= 6) lugares.push([26, meio]);
+          if (partes <= 3) lugares.push([56, meio - largura / 4], [56, meio + largura / 4]);
+          lugares.forEach(([r, g]) => {
+            const [x, y] = ponto(r, g);
+            s += `<circle cx="${x}" cy="${y}" r="${partes >= 10 ? 7 : 9}" fill="${COR.calabresa}"/>`;
+          });
+        } else {
+          // Fatia comida: só o contorno tracejado no prato
+          s += `<path d="${caminhoFatia(88, a0, a1)}" fill="${COR.vazio}" stroke="${COR.tracejado}" stroke-width="2" stroke-dasharray="5 4"/>`;
+          if (marcas[i]) {
+            const [x, y] = ponto(58, meio);
+            s += `<text x="${x}" y="${y}" font-size="${partes >= 10 ? 18 : 24}" font-weight="800" fill="${COR.letra}" text-anchor="middle" dominant-baseline="central">${marcas[i]}</text>`;
+          }
+        }
+      }
+      // Linhas do corte
+      if (partes > 1) {
+        for (let i = 0; i < partes; i++) {
+          const [x, y] = ponto(88, -90 + i * largura);
+          s += `<line x1="100" y1="100" x2="${x}" y2="${y}" stroke="${COR.linhaPizza}" stroke-width="2.5"/>`;
+        }
+      }
+      return s + `</svg>`;
+    }
+
+    // Barra de chocolate com linhas × colunas pedaços (marcas igual à pizza)
+    function desenharChocolate(linhas, colunas, marcas) {
+      const lado = 40;
+      const largura = colunas * lado + 24;
+      const altura = linhas * lado + 24;
+      let s = `<svg viewBox="0 0 ${largura} ${altura}" aria-hidden="true">`;
+      // Papel da embalagem por baixo
+      s += `<rect x="2" y="2" width="${largura - 4}" height="${altura - 4}" rx="10" fill="${COR.papel}" stroke="${COR.tracejado}" stroke-width="2"/>`;
+      for (let i = 0; i < linhas * colunas; i++) {
+        const x = 12 + (i % colunas) * lado + 2;
+        const y = 12 + Math.floor(i / colunas) * lado + 2;
+        if (marcas[i] === null) {
+          s += `<rect x="${x}" y="${y}" width="36" height="36" rx="4" fill="${COR.chocolate}"/>`;
+          s += `<rect x="${x + 6}" y="${y + 6}" width="24" height="24" rx="3" fill="${COR.chocolateBrilho}"/>`;
+        } else {
+          s += `<rect x="${x + 1}" y="${y + 1}" width="34" height="34" rx="4" fill="${COR.vazio}" stroke="${COR.tracejado}" stroke-width="2" stroke-dasharray="4 3"/>`;
+          if (marcas[i]) {
+            s += `<text x="${x + 18}" y="${y + 19}" font-size="18" font-weight="800" fill="${COR.letra}" text-anchor="middle" dominant-baseline="central">${marcas[i]}</text>`;
+          }
+        }
+      }
+      return s + `</svg>`;
+    }
+
+    // Um docinho ou salgado no prato, com centro (x, y)
+    function desenharItem(tipo, x, y) {
+      if (tipo === "brigadeiro") {
+        return `<circle cx="${x}" cy="${y}" r="13" fill="#5a3220"/>` +
+          `<circle cx="${x - 5}" cy="${y - 4}" r="2" fill="#ffd23f"/>` +
+          `<circle cx="${x + 4}" cy="${y - 6}" r="2" fill="#ff8f8f"/>` +
+          `<circle cx="${x + 5}" cy="${y + 4}" r="2" fill="#8fe04f"/>` +
+          `<circle cx="${x - 3}" cy="${y + 5}" r="2" fill="#ffffff"/>`;
+      }
+      if (tipo === "morango") {
+        return `<path d="M${x - 11} ${y - 5} Q${x} ${y - 11} ${x + 11} ${y - 5} Q${x + 10} ${y + 8} ${x} ${y + 14} Q${x - 10} ${y + 8} ${x - 11} ${y - 5} Z" fill="#e0393e"/>` +
+          `<path d="M${x - 8} ${y - 8} L${x} ${y - 3} L${x + 8} ${y - 8} L${x} ${y - 13} Z" fill="#3d8f12"/>` +
+          `<circle cx="${x - 4}" cy="${y + 1}" r="1.3" fill="#ffe08a"/>` +
+          `<circle cx="${x + 4}" cy="${y + 2}" r="1.3" fill="#ffe08a"/>` +
+          `<circle cx="${x}" cy="${y + 7}" r="1.3" fill="#ffe08a"/>`;
+      }
+      // pão de queijo
+      return `<circle cx="${x}" cy="${y}" r="13" fill="#f2c66d" stroke="#d9a441" stroke-width="2"/>` +
+        `<circle cx="${x - 4}" cy="${y - 3}" r="2" fill="#d9a441"/>` +
+        `<circle cx="${x + 5}" cy="${y + 2}" r="1.6" fill="#d9a441"/>`;
+    }
+
+    // Prato com "fileiras" fileiras de "porFileira" itens. Cada fileira é 1/fileiras do total.
+    function desenharPrato(fileiras, porFileira, tipo) {
+      const lado = 34;
+      const largura = porFileira * lado + 24;
+      const altura = fileiras * lado + 24;
+      let s = `<svg viewBox="0 0 ${largura} ${altura}" aria-hidden="true">`;
+      s += `<rect x="2" y="2" width="${largura - 4}" height="${altura - 4}" rx="14" fill="${COR.prato}" stroke="${COR.bordaPrato}" stroke-width="3"/>`;
+      // Linhas tracejadas separando as fileiras
+      for (let f = 1; f < fileiras; f++) {
+        const y = 12 + f * lado;
+        s += `<line x1="10" y1="${y}" x2="${largura - 10}" y2="${y}" stroke="${COR.bordaPrato}" stroke-width="2" stroke-dasharray="5 4"/>`;
+      }
+      for (let f = 0; f < fileiras; f++) {
+        for (let c = 0; c < porFileira; c++) {
+          s += desenharItem(tipo, 12 + c * lado + lado / 2, 12 + f * lado + lado / 2);
+        }
+      }
+      return s + `</svg>`;
+    }
+
+    // Escolhe "quantas" posições comidas, todas juntas (fatias vizinhas)
+    function marcasVizinhas(total, quantas, letra = "") {
+      const marcas = Array(total).fill(null);
+      const comeco = sortear(0, total - 1);
+      for (let i = 0; i < quantas; i++) marcas[(comeco + i) % total] = letra;
+      return marcas;
+    }
+
+    // Escolhe "quantas" posições comidas, espalhadas
+    function marcasEspalhadas(total, quantas) {
+      const marcas = Array(total).fill(null);
+      embaralhar([...Array(total).keys()]).slice(0, quantas).forEach((i) => (marcas[i] = ""));
+      return marcas;
+    }
+
+    // Formatos de barra de chocolate (linhas × colunas) para cada total de pedaços
+    const BARRAS = { 3: [1, 3], 4: [2, 2], 6: [2, 3], 8: [2, 4], 9: [3, 3], 10: [2, 5], 12: [3, 4] };
+
+    const COMIDAS_DO_PRATO = [
+      { tipo: "brigadeiro", nome: "brigadeiros" },
+      { tipo: "morango", nome: "morangos" },
+      { tipo: "paoDeQueijo", nome: "pães de queijo" },
+    ];
+
+    // ===== Tipos de pergunta =====
+    // Cada pergunta tem: id (para não repetir), texto, desenho, legenda,
+    // resposta, erradas (erros comuns) e explicação.
+
+    // ----- "Que fração da pizza foi comida?" -----
+    function perguntaDaPizza() {
+      const partes = nivel === "facil" ? umDe([2, 3, 4, 6, 8]) : umDe([6, 8, 10, 12]);
+      const comidas = sortear(1, partes - 1);
+      const sobrou = nivel !== "facil" && Math.random() < 0.5;
+      const a = sobrou ? partes - comidas : comidas; // numerador da resposta
+      const explicacao = sobrou
+        ? `Foram comidas ${comidas} das ${partes} fatias, então sobraram ${a}: ${fr(a, partes)}${seSimplifica(a, partes)}.`
+        : `A pizza tem ${partes} fatias iguais e ${comidas} foram comidas: ${fr(a, partes)}${seSimplifica(a, partes)}.`;
+      return {
+        id: `pizza-${partes}-${comidas}-${sobrou}`,
+        texto: `Que fração da pizza ${sobrou ? "<strong>sobrou</strong>" : "foi <strong>comida</strong>"}?`,
+        desenho: desenharPizza(partes, marcasVizinhas(partes, comidas)),
+        legenda: `A pizza foi cortada em ${partes} fatias iguais. As fatias tracejadas já foram comidas.`,
+        resposta: F(a, partes),
+        erradas: [F(partes - a, partes), F(a, partes - a), F(partes, a), F(a + 1, partes),
+          F(a - 1, partes), F(a, partes + 1), F(a, partes + 2), F(a + 1, partes + 1)],
+        explicacao,
+      };
+    }
+
+    // ----- "Que fração da barra de chocolate foi comida?" -----
+    function perguntaDoChocolate() {
+      const total = nivel === "facil" ? umDe([3, 4, 6, 8]) : umDe([6, 8, 9, 10, 12]);
+      const [linhas, colunas] = BARRAS[total];
+      const comidos = sortear(1, total - 1);
+      const sobrou = nivel !== "facil" && Math.random() < 0.5;
+      const a = sobrou ? total - comidos : comidos;
+      const explicacao = sobrou
+        ? `Foram comidos ${comidos} dos ${total} pedaços, então sobraram ${a}: ${fr(a, total)}${seSimplifica(a, total)}.`
+        : `A barra tem ${total} pedaços iguais e ${comidos} foram comidos: ${fr(a, total)}${seSimplifica(a, total)}.`;
+      return {
+        id: `chocolate-${total}-${comidos}-${sobrou}`,
+        texto: `Que fração da barra de chocolate ${sobrou ? "<strong>sobrou</strong>" : "foi <strong>comida</strong>"}?`,
+        desenho: desenharChocolate(linhas, colunas, marcasEspalhadas(total, comidos)),
+        legenda: `A barra tem ${total} pedaços iguais. Os pedaços tracejados já foram comidos.`,
+        resposta: F(a, total),
+        erradas: [F(total - a, total), F(a, total - a), F(total, a), F(a + 1, total),
+          F(a - 1, total), F(a, total + 1), F(a, total + 2), F(a + 1, total + 1)],
+        explicacao,
+      };
+    }
+
+    // ----- "Há 12 brigadeiros e você comeu 2/3 deles. Quantos comeu?" -----
+    function perguntaDoPrato() {
+      // Numeradores de 2 até d-1 que já estão na forma mais simples (2/3, 3/4, 5/6...)
+      const numeradores = (d) => [...Array(d).keys()].filter((k) => k >= 2 && mdc(k, d) === 1);
+      let d, m, k, sobrou;
+      if (nivel === "facil") {
+        d = umDe([2, 3, 4]); m = sortear(2, 4); k = 1; sobrou = false;
+      } else if (nivel === "medio") {
+        d = umDe([3, 4, 5, 6]); m = sortear(2, 5); k = umDe(numeradores(d)); sobrou = false;
+      } else {
+        d = umDe([3, 4, 5, 6]); m = sortear(3, 6); k = umDe(numeradores(d)); sobrou = Math.random() < 0.5;
+      }
+      const total = d * m;
+      const parte = m;                       // 1/d do prato
+      const resposta = sobrou ? (d - k) * m : k * m;
+      const comida = umDe(COMIDAS_DO_PRATO);
+      const explicacao = sobrou
+        ? `Se você comeu ${fr(k, d)}, sobraram ${fr(d - k, d)}. ${total} ÷ ${d} = ${parte}, e ${d - k} × ${parte} = ${resposta}.`
+        : `${total} ÷ ${d} = ${parte}, então ${fr(1, d)} de ${total} é ${parte}.` +
+          (k > 1 ? ` E ${fr(k, d)} é ${k} × ${parte} = ${resposta}.` : "");
+      return {
+        id: `prato-${d}-${m}-${k}-${sobrou}`,
+        texto: `Num prato há <strong>${total} ${comida.nome}</strong>. Você comeu <strong>${fr(k, d)}</strong> deles. ` +
+          (sobrou ? "Quantos <strong>sobraram</strong>?" : `Quantos ${comida.nome} você <strong>comeu</strong>?`),
+        desenho: desenharPrato(d, m, comida.tipo),
+        legenda: `Cada fileira é ${fr(1, d)} do prato.`,
+        resposta,
+        erradas: [parte, sobrou ? k * m : (d - k) * m, resposta + parte, resposta - parte,
+          total, resposta + 1, resposta - 1, k * d, total - k],
+        explicacao,
+      };
+    }
+
+    // ----- "Ana comeu 2/8 e Beto comeu 3/8. Quanto comeram juntos?" -----
+    function perguntaSomaDaPizza() {
+      const partes = umDe([6, 8, 10, 12]);
+      const a = sortear(1, partes - 2);
+      const b = sortear(1, partes - 1 - a);
+      const [nome1, nome2] = umDe(DUPLAS);
+      const marcas = Array(partes).fill(null);
+      for (let i = 0; i < a; i++) marcas[i] = nome1[0];
+      for (let i = a; i < a + b; i++) marcas[i] = nome2[0];
+      const soma = a + b;
+      return {
+        id: `soma-${partes}-${a}-${b}`,
+        texto: `${nome1} comeu ${fr(a, partes)} da pizza e ${nome2} comeu ${fr(b, partes)}. Que fração da pizza os dois comeram <strong>juntos</strong>?`,
+        desenho: desenharPizza(partes, marcas),
+        legenda: `${nome1[0]} = fatias de ${nome1} · ${nome2[0]} = fatias de ${nome2}`,
+        resposta: F(soma, partes),
+        erradas: [F(soma, partes * 2), F(partes - soma, partes), F(soma + 1, partes),
+          F(soma - 1, partes), F(a * b, partes), F(soma, partes + 1)],
+        explicacao: `Denominadores iguais: soma só os numeradores. ${fr(a, partes)} + ${fr(b, partes)} = ${fr(soma, partes)}${seSimplifica(soma, partes)}.`,
+      };
+    }
+
+    // ----- "A pizza tinha 8 fatias e 6 foram comidas. Forma mais simples?" -----
+    function perguntaSimplificar() {
+      const partes = nivel === "medio" ? umDe([4, 6, 8, 10]) : umDe([8, 10, 12]);
+      // Só quantidades que dá para simplificar (ex.: 6 de 8, mas não 5 de 8)
+      const possiveis = [...Array(partes - 1).keys()].map((i) => i + 1).filter((k) => mdc(k, partes) > 1);
+      const comidas = umDe(possiveis);
+      const g = mdc(comidas, partes);
+      const s = simplificar(comidas, partes);
+      return {
+        id: `simplificar-${partes}-${comidas}`,
+        texto: `A pizza tinha <strong>${partes} fatias</strong> e <strong>${comidas}</strong> foram comidas. Que fração foi comida, na <strong>forma mais simples</strong>?`,
+        desenho: desenharPizza(partes, marcasVizinhas(partes, comidas)),
+        legenda: `As fatias tracejadas já foram comidas.`,
+        resposta: s,
+        erradas: [F(s.d - s.n, s.d), F(s.d, s.n), F(s.n + 1, s.d), F(s.n, s.d + 1),
+          F(comidas, partes - comidas), F(s.n, partes), F(1, comidas)],
+        explicacao: `${fr(comidas, partes)}: divida em cima e embaixo por ${g}. ${comidas} ÷ ${g} = ${s.n} e ${partes} ÷ ${g} = ${s.d}. Fica ${fr(s.n, s.d)}.`,
+      };
+    }
+
+    // ----- "Lia comeu 1/2 da barra e Caio comeu 1/3. Quanto comeram juntos?" -----
+    function perguntaSomaDiferentes() {
+      const denominadores = [2, 3, 4, 5, 6, 8, 10, 12];
+      let d1, d2, n1, n2, total, x, y;
+      // Sorteia até achar duas frações que cabem numa barra (6, 8, 10 ou 12 pedaços)
+      do {
+        d1 = umDe(denominadores);
+        d2 = umDe(denominadores);
+        total = mmc(d1, d2);
+        n1 = sortear(1, d1 - 1);
+        n2 = sortear(1, d2 - 1);
+        x = (n1 * total) / d1;   // pedaços da primeira pessoa
+        y = (n2 * total) / d2;   // pedaços da segunda pessoa
+      } while (
+        d1 === d2 || ![6, 8, 10, 12].includes(total) ||
+        mdc(n1, d1) > 1 || mdc(n2, d2) > 1 || x + y >= total
+      );
+      const sobrou = Math.random() < 0.4;
+      const [nome1, nome2] = umDe(DUPLAS);
+      const [linhas, colunas] = BARRAS[total];
+      const marcas = Array(total).fill(null);
+      for (let i = 0; i < x; i++) marcas[i] = nome1[0];
+      for (let i = x; i < x + y; i++) marcas[i] = nome2[0];
+
+      const juntos = simplificar(x + y, total);
+      const resto = simplificar(total - x - y, total);
+      const resposta = sobrou ? resto : juntos;
+      const outra = sobrou ? juntos : resto;
+      const passo1 = `Em ${total} pedaços: ${fr(n1, d1)} = ${fr(x, total)} e ${fr(n2, d2)} = ${fr(y, total)}. `;
+      const explicacao = sobrou
+        ? passo1 + `Comeram ${fr(x + y, total)}, então sobrou ${fr(total - x - y, total)}${seSimplifica(total - x - y, total)}.`
+        : passo1 + `Juntos: ${fr(x + y, total)}${seSimplifica(x + y, total)}.`;
+      return {
+        id: `diferentes-${n1}/${d1}-${n2}/${d2}-${sobrou}`,
+        texto: `${nome1} comeu ${fr(n1, d1)} da barra de chocolate e ${nome2} comeu ${fr(n2, d2)}. ` +
+          (sobrou ? "Que fração da barra <strong>sobrou</strong>?" : "Que fração da barra eles comeram <strong>juntos</strong>?"),
+        desenho: desenharChocolate(linhas, colunas, marcas),
+        legenda: `A barra tem ${total} pedaços iguais. ${nome1[0]} = de ${nome1} · ${nome2[0]} = de ${nome2}`,
+        resposta,
+        // Erro comum: somar em cima e embaixo (1/2 + 1/3 = 2/5)
+        erradas: [F(n1 + n2, d1 + d2), outra, F(resposta.n + 1, resposta.d), F(resposta.n, resposta.d + 1),
+          F(n1 * n2, d1 * d2), F(n1 + n2, total), F(resposta.d - resposta.n + 1, resposta.d)],
+        explicacao,
+      };
+    }
+
+    // Sorteia o tipo de pergunta conforme o nível
+    function sortearPergunta() {
+      const r = Math.random();
+      if (nivel === "facil") {
+        if (r < 0.4) return perguntaDaPizza();
+        if (r < 0.7) return perguntaDoChocolate();
+        return perguntaDoPrato();
+      }
+      if (nivel === "medio") {
+        if (r < 0.15) return perguntaDaPizza();
+        if (r < 0.3) return perguntaDoChocolate();
+        if (r < 0.55) return perguntaDoPrato();
+        if (r < 0.8) return perguntaSomaDaPizza();
+        return perguntaSimplificar();
+      }
+      // Difícil
+      if (r < 0.45) return perguntaSomaDiferentes();
+      if (r < 0.75) return perguntaDoPrato();
+      return perguntaSimplificar();
+    }
+
+    // Resposta errada que pode aparecer como opção
+    function opcaoValida(v) {
+      if (ehFracao(v)) return Number.isInteger(v.n) && Number.isInteger(v.d) && v.n >= 1 && v.d >= 2;
+      return Number.isInteger(v) && v > 0;
+    }
+
+    // Monta as 4 opções: a certa + 3 erradas.
+    // Nenhuma errada pode valer o mesmo que a certa (ex.: 2/4 quando a resposta é 1/2).
+    function montarOpcoes(resposta, erradas) {
+      const escolhidas = [];
+      embaralhar(erradas).forEach((v) => {
+        if (escolhidas.length < 3 && opcaoValida(v) && !mesmoValor(v, resposta) &&
+            !escolhidas.some((e) => mesmoValor(e, v))) {
+          escolhidas.push(v);
+        }
+      });
+      // Garantia: se faltar opção, completa com valores próximos
+      let extra = 1;
+      while (escolhidas.length < 3) {
+        const candidato = ehFracao(resposta) ? F(resposta.n, resposta.d + extra) : resposta + extra;
+        if (!escolhidas.some((e) => mesmoValor(e, candidato))) escolhidas.push(candidato);
+        extra++;
+      }
+      return embaralhar([resposta, ...escolhidas]);
+    }
+
+    // ===== Pontuação (igual em todos os jogos do Fliperama) =====
+    // Acerto de primeira: 100 pontos. Acerto depois de errar: 50 pontos.
+    // Bônus de rapidez: até +50, perdendo 1 ponto a cada segundo de demora.
+    const PONTOS_ACERTO_PRIMEIRA = 100;
+    const PONTOS_ACERTO_DEPOIS = 50;
+    const BONUS_MAXIMO = 50;
+    const BONUS_PERDE_POR_SEGUNDO = 1;
+
+    function calcularPontos(acertouDePrimeira, segundosNaPergunta) {
+      const base = acertouDePrimeira ? PONTOS_ACERTO_PRIMEIRA : PONTOS_ACERTO_DEPOIS;
+      const bonus = Math.max(0, BONUS_MAXIMO - BONUS_PERDE_POR_SEGUNDO * segundosNaPergunta);
+      return { base, bonus, total: base + bonus };
+    }
+
+    // Mensagem de acerto com os pontos ganhos
+    function mensagemDePontos(acertouDePrimeira, ganho) {
+      const inicio = acertouDePrimeira ? "Acertou! Na primeira!" : "Acertou! Agora foi.";
+      const detalhe = ganho.bonus > 0 ? ` (${ganho.base} + ${ganho.bonus} de rapidez)` : "";
+      return `${inicio} +${ganho.total} pontos${detalhe}.`;
+    }
+
+    // ===== Cronômetro =====
+
+    function tempoPassado() {
+      return Math.floor((Date.now() - inicio) / 1000);
+    }
+
+    function formatarTempo(segundos) {
+      const min = Math.floor(segundos / 60);
+      const seg = segundos % 60;
+      return min + ":" + String(seg).padStart(2, "0");
+    }
+
+    function ligarCronometro() {
+      inicio = Date.now();
+      el("relogio").textContent = "0:00";
+      cronometro = setInterval(() => {
+        el("relogio").textContent = formatarTempo(tempoPassado());
+      }, 1000);
+    }
+
+    function desligarCronometro() {
+      clearInterval(cronometro);
+      return tempoPassado();
+    }
+
+    // ===== Rodadas =====
+    function novaRodada() {
+      rodada++;
+      errouNestaRodada = false;
+      inicioPergunta = Date.now();
+      // Sorteia de novo se a pergunta já apareceu nesta partida
+      perguntaAtual = sortearPergunta();
+      for (let tentativa = 0; tentativa < 50 && jaSaiu.includes(perguntaAtual.id); tentativa++) {
+        perguntaAtual = sortearPergunta();
+      }
+      jaSaiu.push(perguntaAtual.id);
+
+      el("rodada").textContent = `Pergunta ${rodada} de ${TOTAL_PERGUNTAS} · Nível ${NOMES_DOS_NIVEIS[nivel]}`;
+      el("pergunta").innerHTML = perguntaAtual.texto;
+      el("desenho").innerHTML = perguntaAtual.desenho;
+      el("legenda").innerHTML = perguntaAtual.legenda;
+
+      el("mensagem").hidden = true;
+      el("explicacao").hidden = true;
+      el("proxima").hidden = true;
+
+      // Cria os botões de resposta
+      const opcoes = el("opcoes");
+      opcoes.innerHTML = "";
+      montarOpcoes(perguntaAtual.resposta, perguntaAtual.erradas).forEach((valor) => {
+        const botao = document.createElement("button");
+        botao.className = "botao opcao";
+        botao.innerHTML = mostrar(valor);
+        botao.addEventListener("click", () => responder(botao, valor));
+        opcoes.appendChild(botao);
+      });
+    }
+
+    function responder(botao, valor) {
+      const mensagem = el("mensagem");
+      mensagem.hidden = false;
+
+      if (mesmoValor(valor, perguntaAtual.resposta)) {
+        // Acertou!
+        const dePrimeira = !errouNestaRodada;
+        if (dePrimeira) acertos++;
+        const segundos = Math.floor((Date.now() - inicioPergunta) / 1000);
+        const ganho = calcularPontos(dePrimeira, segundos);
+        pontos += ganho.total;
+        el("placar").textContent = pontos;
+        botao.classList.add("opcao--certa");
+        mensagem.className = "mensagem mensagem--acerto";
+        mensagem.textContent = mensagemDePontos(dePrimeira, ganho);
+        el("explicacao").innerHTML = perguntaAtual.explicacao;
+        el("explicacao").hidden = false;
+
+        // Trava as opções e mostra o botão de seguir
+        el("opcoes").querySelectorAll("button").forEach((b) => (b.disabled = true));
+        const proxima = el("proxima");
+        proxima.textContent = rodada < TOTAL_PERGUNTAS ? "Próxima pergunta" : "Ver resultado";
+        proxima.hidden = false;
+        proxima.focus();
+      } else {
+        // Errou: marca e deixa tentar de novo
+        errouNestaRodada = true;
+        botao.classList.add("opcao--errada");
+        botao.disabled = true;
+        mensagem.className = "mensagem mensagem--erro";
+        mensagem.textContent = `Ainda não! ${emTexto(valor)} não é a resposta. Tente de novo.`;
+      }
+    }
+
+    function mostrarFinal() {
+      const segundos = desligarCronometro();
+      el("telaJogo").hidden = true;
+      el("telaFinal").hidden = false;
+      el("tituloFinal").textContent =
+        acertos >= 8 ? "Que banquete!" : acertos >= 5 ? "Mandou bem!" : "Bora treinar mais!";
+      // O resultado também vira fração!
+      el("textoFinal").innerHTML =
+        `Nível ${NOMES_DOS_NIVEIS[nivel]}: você fez <strong>${pontos} pontos</strong> e acertou ${acertos} de ${TOTAL_PERGUNTAS} de primeira. ` +
+        `Isso é ${fr(acertos, TOTAL_PERGUNTAS)} das perguntas!`;
+      const min = Math.floor(segundos / 60);
+      const seg = segundos % 60;
+      el("tempoFinal").textContent =
+        "Seu tempo: " + (min > 0 ? `${min} min e ` : "") + `${seg} s. Será que dá para ser mais rápido?`;
+      // Ranking: mostra a caixa para salvar e o ranking deste nível
+      tempoDaPartida = segundos;
+      el("nick").value = "";
+      el("linhaRanking").hidden = false;
+      el("caixaRanking").hidden = false;
+      el("mensagemRanking").hidden = true;
+      el("tituloRankingFinal").textContent = `Ranking · Nível ${NOMES_DOS_NIVEIS[nivel]}`;
+      Ranking.desenharTabela(el("rankingFinal"), JOGO_ID, nivel);
+    }
+
+    // ===== Ranking =====
+
+    function salvarNoRanking() {
+      const msg = el("mensagemRanking");
+      const conferido = Ranking.validarNick(el("nick").value);
+      msg.hidden = false;
+      if (!conferido.ok) {
+        msg.className = "mensagem mensagem--erro";
+        msg.textContent = conferido.erro;
+        return;
+      }
+      const nick = conferido.nick;
+      const r = Ranking.salvar({
+        jogo: JOGO_ID, nomeDoJogo: NOME_DO_JOGO, nivel, nick, pontos, tempo: tempoDaPartida,
+      });
+      if (!r.gravou) {
+        msg.className = "mensagem mensagem--erro";
+        msg.textContent = "Não deu para salvar neste navegador.";
+        return;
+      }
+      msg.className = "mensagem mensagem--acerto";
+      if (r.recorde && r.anterior) msg.textContent = `Novo recorde, ${nick}! Antes eram ${r.anterior.pontos} pontos.`;
+      else if (r.recorde) msg.textContent = `Pronto, ${nick}! Você entrou no ranking.`;
+      else msg.textContent = `Boa, ${nick}! Seu recorde continua ${r.atual.pontos} pontos.`;
+      el("linhaRanking").hidden = true; // salva só uma vez por partida
+      Ranking.desenharTabela(el("rankingFinal"), JOGO_ID, nivel, nick);
+    }
+
+    // Abre a tela do ranking na aba do nível escolhido
+    function abrirRanking(nivelDaAba) {
+      document.querySelectorAll(".aba").forEach((aba) => {
+        aba.setAttribute("aria-selected", aba.dataset.aba === nivelDaAba ? "true" : "false");
+      });
+      Ranking.desenharTabela(el("tabelaRanking"), JOGO_ID, nivelDaAba);
+    }
+
+    el("salvarRanking").addEventListener("click", salvarNoRanking);
+    el("nick").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") salvarNoRanking();
+    });
+    el("pularRanking").addEventListener("click", () => {
+      el("caixaRanking").hidden = true;
+    });
+    el("verRanking").addEventListener("click", () => {
+      el("telaInicio").hidden = true;
+      el("telaRanking").hidden = false;
+      abrirRanking(nivel);
+    });
+    document.querySelectorAll(".aba").forEach((aba) => {
+      aba.addEventListener("click", () => abrirRanking(aba.dataset.aba));
+    });
+    el("voltarDoRanking").addEventListener("click", () => {
+      el("telaRanking").hidden = true;
+      el("telaInicio").hidden = false;
+    });
+
+    function comecar() {
+      jaSaiu = [];
+      rodada = 0;
+      acertos = 0;
+      pontos = 0;
+      el("placar").textContent = "0";
+      el("telaInicio").hidden = true;
+      el("telaFinal").hidden = true;
+      el("telaJogo").hidden = false;
+      ligarCronometro();
+      novaRodada();
+    }
+
+    // Botões de nível: guardam o nível escolhido e começam o jogo
+    document.querySelectorAll(".nivel").forEach((botao) => {
+      botao.addEventListener("click", () => {
+        nivel = botao.dataset.nivel;
+        comecar();
+      });
+    });
+
+    el("proxima").addEventListener("click", () => {
+      if (rodada < TOTAL_PERGUNTAS) novaRodada();
+      else mostrarFinal();
+    });
+    el("denovo").addEventListener("click", comecar);
+    el("mudarNivel").addEventListener("click", () => {
+      el("telaFinal").hidden = true;
+      el("telaInicio").hidden = false;
+    });
+
+    // Vitrine da tela inicial: pizza, chocolate e brigadeiros
+    el("vitrine").innerHTML =
+      desenharPizza(8, [null, null, null, null, null, null, "", ""]) +
+      desenharChocolate(2, 3, [null, null, "", null, null, null]) +
+      desenharPrato(2, 3, "brigadeiro");
+  </script>
 </body>
 </html>
