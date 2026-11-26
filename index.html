@@ -22,7 +22,7 @@
       color: var(--amarelo);
     }
 
-    /* Título da parte "Jogos de exemplo" */
+    /* Títulos das partes "Jogos prontos" e "Em construção" */
     .inicio__secao {
       margin: 3rem 0 1.25rem;
       font-size: clamp(1.5rem, 3vw, 2rem);
@@ -50,7 +50,7 @@
       margin: 0;
     }
 
-    /* Símbolos dos jogos de exemplo: traço mais fino que os números */
+    /* Símbolos dos jogos bônus: traço mais fino que os números */
     .simbolo {
       stroke-width: 9;
     }
@@ -202,154 +202,28 @@
 
   <main class="inicio">
 
-    <h2 class="inicio__secao inicio__secao--primeira">Jogos dos grupos</h2>
-    <p class="inicio__dica">Cada número é um grupo. <strong>Encontre o seu e aperte Jogar!</strong></p>
-
-    <!--
-      Os cartões abaixo vêm do arquivo grupos.md (preenchido pela professora).
-      Enquanto o grupo não tem jogo, o cartão mostra "Jogo em construção".
-    -->
-    <ol class="zonas">
+    <!-- CARTOES:INICIO (feito pelo ferramentas/atualizar-cartoes.py, não edite à mão) -->
+    <h2 class="inicio__secao inicio__secao--primeira">Jogos prontos</h2>
+    <p class="inicio__dica">Escolha um jogo e <strong>aperte Jogar!</strong></p>
+    <ul class="zonas">
       <!-- Grupo 1 -->
       <li class="zona" style="--cor-linha: var(--amarelo)">
         <div class="zona__camisa">
           <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 1"><use href="#d0" x="0" width="60" height="100"/><use href="#d1" x="76" width="60" height="100"/></svg>
           <span class="zona__palavra" aria-hidden="true">Grupo</span>
         </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
+        <h3 class="zona__titulo">Lanchonete das Frações</h3>
         <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Matemática:</dt> <dd>frações</dd></div>
           <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-01/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 1</span></a>
       </li>
-      <!-- Grupo 2 -->
-      <li class="zona" style="--cor-linha: var(--branco)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 2"><use href="#d0" x="0" width="60" height="100"/><use href="#d2" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-02/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 2</span></a>
-      </li>
-      <!-- Grupo 3 -->
+      <!-- Jogo bônus: Desafio da Porcentagem -->
       <li class="zona" style="--cor-linha: var(--verde)">
         <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 3"><use href="#d0" x="0" width="60" height="100"/><use href="#d3" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-03/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 3</span></a>
-      </li>
-      <!-- Grupo 4 -->
-      <li class="zona" style="--cor-linha: var(--vermelho)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 4"><use href="#d0" x="0" width="60" height="100"/><use href="#d4" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-04/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 4</span></a>
-      </li>
-      <!-- Grupo 5 -->
-      <li class="zona" style="--cor-linha: var(--amarelo)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 5"><use href="#d0" x="0" width="60" height="100"/><use href="#d5" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-05/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 5</span></a>
-      </li>
-      <!-- Grupo 6 -->
-      <li class="zona" style="--cor-linha: var(--branco)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 6"><use href="#d0" x="0" width="60" height="100"/><use href="#d6" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-06/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 6</span></a>
-      </li>
-      <!-- Grupo 7 -->
-      <li class="zona" style="--cor-linha: var(--verde)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 7"><use href="#d0" x="0" width="60" height="100"/><use href="#d7" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-07/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 7</span></a>
-      </li>
-      <!-- Grupo 8 -->
-      <li class="zona" style="--cor-linha: var(--vermelho)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 8"><use href="#d0" x="0" width="60" height="100"/><use href="#d8" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-08/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 8</span></a>
-      </li>
-      <!-- Grupo 9 -->
-      <li class="zona" style="--cor-linha: var(--amarelo)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 9"><use href="#d0" x="0" width="60" height="100"/><use href="#d9" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-09/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 9</span></a>
-      </li>
-      <!-- Grupo 10 -->
-      <li class="zona" style="--cor-linha: var(--branco)">
-        <div class="zona__camisa">
-          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 10"><use href="#d1" x="0" width="60" height="100"/><use href="#d0" x="76" width="60" height="100"/></svg>
-          <span class="zona__palavra" aria-hidden="true">Grupo</span>
-        </div>
-        <h2 class="zona__titulo">Jogo em construção</h2>
-        <dl class="zona__info">
-          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
-        </dl>
-        <a class="botao zona__botao" href="jogos/grupo-10/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 10</span></a>
-      </li>
-    </ol>
-
-    <!-- Jogos de exemplo: não são de nenhum grupo -->
-    <h2 class="inicio__secao">Jogos de exemplo</h2>
-    <ul class="zonas">
-      <!-- Exemplo 1: porcentagem -->
-      <li class="zona" style="--cor-linha: var(--verde)">
-        <div class="zona__camisa">
-          <!-- Símbolo de porcentagem desenhado em SVG -->
           <svg class="numero simbolo" viewBox="0 0 60 100" aria-hidden="true"><path d="M10 12 H24 V32 H10 Z M36 68 H50 V88 H36 Z M52 10 L8 90"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Bônus</span>
         </div>
         <h3 class="zona__titulo">Desafio da Porcentagem</h3>
         <dl class="zona__info">
@@ -357,11 +231,11 @@
         </dl>
         <a class="botao zona__botao" href="jogos/exemplo/index.html">Jogar<span class="so-leitor"> o Desafio da Porcentagem</span></a>
       </li>
-      <!-- Exemplo 2: equações, potências e raízes -->
+      <!-- Jogo bônus: Contra o Relógio -->
       <li class="zona" style="--cor-linha: var(--amarelo)">
         <div class="zona__camisa">
-          <!-- Sinal de raiz desenhado em SVG -->
           <svg class="numero simbolo" viewBox="0 0 60 100" aria-hidden="true"><path d="M4 62 L14 56 L26 88 L40 10 H58"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Bônus</span>
         </div>
         <h3 class="zona__titulo">Contra o Relógio</h3>
         <dl class="zona__info">
@@ -370,6 +244,129 @@
         <a class="botao zona__botao" href="jogos/exemplo-2/index.html">Jogar<span class="so-leitor"> o Contra o Relógio</span></a>
       </li>
     </ul>
+
+    <h2 class="inicio__secao">Em construção</h2>
+    <p class="inicio__dica">Estes grupos ainda estão criando o jogo. <strong>Volte logo!</strong></p>
+    <ul class="zonas">
+      <!-- Grupo 2 -->
+      <li class="zona" style="--cor-linha: var(--branco)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 2"><use href="#d0" x="0" width="60" height="100"/><use href="#d2" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-02/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 2</span></a>
+      </li>
+      <!-- Grupo 3 -->
+      <li class="zona" style="--cor-linha: var(--verde)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 3"><use href="#d0" x="0" width="60" height="100"/><use href="#d3" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-03/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 3</span></a>
+      </li>
+      <!-- Grupo 4 -->
+      <li class="zona" style="--cor-linha: var(--vermelho)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 4"><use href="#d0" x="0" width="60" height="100"/><use href="#d4" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-04/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 4</span></a>
+      </li>
+      <!-- Grupo 5 -->
+      <li class="zona" style="--cor-linha: var(--amarelo)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 5"><use href="#d0" x="0" width="60" height="100"/><use href="#d5" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-05/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 5</span></a>
+      </li>
+      <!-- Grupo 6 -->
+      <li class="zona" style="--cor-linha: var(--branco)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 6"><use href="#d0" x="0" width="60" height="100"/><use href="#d6" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-06/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 6</span></a>
+      </li>
+      <!-- Grupo 7 -->
+      <li class="zona" style="--cor-linha: var(--verde)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 7"><use href="#d0" x="0" width="60" height="100"/><use href="#d7" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-07/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 7</span></a>
+      </li>
+      <!-- Grupo 8 -->
+      <li class="zona" style="--cor-linha: var(--vermelho)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 8"><use href="#d0" x="0" width="60" height="100"/><use href="#d8" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-08/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 8</span></a>
+      </li>
+      <!-- Grupo 9 -->
+      <li class="zona" style="--cor-linha: var(--amarelo)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 9"><use href="#d0" x="0" width="60" height="100"/><use href="#d9" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-09/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 9</span></a>
+      </li>
+      <!-- Grupo 10 -->
+      <li class="zona" style="--cor-linha: var(--branco)">
+        <div class="zona__camisa">
+          <svg class="numero" viewBox="0 0 136 100" role="img" aria-label="Grupo 10"><use href="#d1" x="0" width="60" height="100"/><use href="#d0" x="76" width="60" height="100"/></svg>
+          <span class="zona__palavra" aria-hidden="true">Grupo</span>
+        </div>
+        <h3 class="zona__titulo">Jogo em construção</h3>
+        <dl class="zona__info">
+          <div><dt>Matemática:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
+        </dl>
+        <a class="botao zona__botao" href="jogos/grupo-10/index.html">Espiar<span class="so-leitor"> como está o jogo do Grupo 10</span></a>
+      </li>
+    </ul>
+    <!-- CARTOES:FIM -->
 
     <!-- Cada jogo tem o seu ranking, guardado só neste computador -->
     <div class="ranking-local">

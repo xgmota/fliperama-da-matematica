@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Pede aos sites de busca (Google etc.) para não listar esta página -->
   <meta name="robots" content="noindex, nofollow">
+  <!-- Conteúdo de matemática (aparece no cartão da página inicial) -->
+  <meta name="matematica" content="frações">
   <title>Lanchonete das Frações · Fliperama da Matemática</title>
   <!-- Visual comum a todos os jogos (cores, cabeçalho, botões e níveis) -->
   <link rel="stylesheet" href="../../estilo-comum.css">
@@ -142,9 +144,42 @@
     }
 
     .jogo__desenho figcaption {
+      display: grid;
+      gap: 0.6rem;
+      justify-items: center;
       font-weight: 700;
       text-align: center;
       line-height: 1.5;
+    }
+
+    /* Legenda: o que é "comida" e o que "sobrou" */
+    .cores {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .cor-chave {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      background: var(--branco);
+      box-shadow: inset 0 0 0 2px var(--linha-piso-claro);
+      font-size: 1rem;
+    }
+
+    .cor-chave svg {
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+
+    /* A parte que a pergunta pede fica com contorno azul */
+    .cor-chave--ativa {
+      color: var(--azul-quadra);
+      box-shadow: inset 0 0 0 3px var(--azul-quadra);
     }
 
     /* Vitrine de comidas na tela inicial */
@@ -455,6 +490,7 @@
       massa: "#d98c2b", queijo: "#ffd34d", calabresa: "#d9432f", linhaPizza: "#8a5a1c",
       vazio: "#f7efe1", tracejado: "#b8925a", letra: "#6b4a1f",
       chocolate: "#6e3f22", chocolateBrilho: "#86522f", papel: "#efe3cf",
+      migalha: "#d9b98a", destaque: "#1c4f96",
     };
 
     // Ponto na borda de um círculo com centro (100, 100)
@@ -472,8 +508,9 @@
     }
 
     // Pizza com "partes" fatias. marcas[i]: null = fatia inteira,
-    // "" = fatia comida, "A" = fatia comida pela pessoa com inicial A
-    function desenharPizza(partes, marcas) {
+    // "" = fatia comida, "A" = fatia comida pela pessoa com inicial A.
+    // destaque: "comida" ou "sobrou" = contorno azul na parte que a pergunta pede
+    function desenharPizza(partes, marcas, destaque = null) {
       let s = `<svg viewBox="0 0 200 200" aria-hidden="true">`;
       s += `<circle cx="100" cy="100" r="97" fill="${COR.prato}" stroke="${COR.bordaPrato}" stroke-width="3"/>`;
       const largura = 360 / partes;
@@ -493,8 +530,12 @@
             s += `<circle cx="${x}" cy="${y}" r="${partes >= 10 ? 7 : 9}" fill="${COR.calabresa}"/>`;
           });
         } else {
-          // Fatia comida: só o contorno tracejado no prato
+          // Fatia comida: prato vazio, contorno tracejado e migalhas
           s += `<path d="${caminhoFatia(88, a0, a1)}" fill="${COR.vazio}" stroke="${COR.tracejado}" stroke-width="2" stroke-dasharray="5 4"/>`;
+          [[32, meio - largura / 8], [78, meio + largura / 6], [76, meio - largura / 5]].forEach(([r, g]) => {
+            const [x, y] = ponto(r, g);
+            s += `<circle cx="${x}" cy="${y}" r="2.5" fill="${COR.migalha}"/>`;
+          });
           if (marcas[i]) {
             const [x, y] = ponto(58, meio);
             s += `<text x="${x}" y="${y}" font-size="${partes >= 10 ? 18 : 24}" font-weight="800" fill="${COR.letra}" text-anchor="middle" dominant-baseline="central">${marcas[i]}</text>`;
@@ -508,11 +549,21 @@
           s += `<line x1="100" y1="100" x2="${x}" y2="${y}" stroke="${COR.linhaPizza}" stroke-width="2.5"/>`;
         }
       }
+      // Contorno azul nas fatias que a pergunta pede
+      if (destaque) {
+        for (let i = 0; i < partes; i++) {
+          const comida = marcas[i] !== null;
+          if ((destaque === "comida") === comida) {
+            const a0 = -90 + i * largura;
+            s += `<path d="${caminhoFatia(90, a0, a0 + largura)}" fill="none" stroke="${COR.destaque}" stroke-width="5" stroke-linejoin="round"/>`;
+          }
+        }
+      }
       return s + `</svg>`;
     }
 
-    // Barra de chocolate com linhas × colunas pedaços (marcas igual à pizza)
-    function desenharChocolate(linhas, colunas, marcas) {
+    // Barra de chocolate com linhas × colunas pedaços (marcas e destaque igual à pizza)
+    function desenharChocolate(linhas, colunas, marcas, destaque = null) {
       const lado = 40;
       const largura = colunas * lado + 24;
       const altura = linhas * lado + 24;
@@ -530,6 +581,10 @@
           if (marcas[i]) {
             s += `<text x="${x + 18}" y="${y + 19}" font-size="18" font-weight="800" fill="${COR.letra}" text-anchor="middle" dominant-baseline="central">${marcas[i]}</text>`;
           }
+        }
+        // Contorno azul nos pedaços que a pergunta pede
+        if (destaque && (destaque === "comida") === (marcas[i] !== null)) {
+          s += `<rect x="${x - 1}" y="${y - 1}" width="38" height="38" rx="5" fill="none" stroke="${COR.destaque}" stroke-width="4"/>`;
         }
       }
       return s + `</svg>`;
@@ -577,6 +632,22 @@
       return s + `</svg>`;
     }
 
+    // Legenda embaixo do desenho: o que foi comido e o que sobrou.
+    // A parte que a pergunta pede fica com contorno azul, igual ao desenho.
+    function legendaDasCores(tipo, destaque) {
+      const ehPizza = tipo === "pizza";
+      const vazio = `<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="2" width="16" height="16" rx="3" fill="${COR.vazio}" stroke="${COR.tracejado}" stroke-width="2" stroke-dasharray="3 2"/><circle cx="8" cy="9" r="1.6" fill="${COR.migalha}"/><circle cx="13" cy="13" r="1.6" fill="${COR.migalha}"/></svg>`;
+      const cheio = ehPizza
+        ? `<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="2" width="16" height="16" rx="3" fill="${COR.queijo}" stroke="${COR.massa}" stroke-width="3"/><circle cx="10" cy="10" r="3.5" fill="${COR.calabresa}"/></svg>`
+        : `<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="2" width="16" height="16" rx="3" fill="${COR.chocolate}"/><rect x="6" y="6" width="8" height="8" rx="2" fill="${COR.chocolateBrilho}"/></svg>`;
+      const chave = (amostra, texto, ativa) =>
+        `<span class="cor-chave${ativa ? " cor-chave--ativa" : ""}">${amostra}${texto}</span>`;
+      return `<span class="cores">` +
+        chave(vazio, ehPizza ? "Comida (vazio)" : "Comido (vazio)", destaque === "comida") +
+        chave(cheio, "Sobrou", destaque === "sobrou") +
+        `</span>`;
+    }
+
     // Escolhe "quantas" posições comidas, todas juntas (fatias vizinhas)
     function marcasVizinhas(total, quantas, letra = "") {
       const marcas = Array(total).fill(null);
@@ -617,8 +688,10 @@
       return {
         id: `pizza-${partes}-${comidas}-${sobrou}`,
         texto: `Que fração da pizza ${sobrou ? "<strong>sobrou</strong>" : "foi <strong>comida</strong>"}?`,
-        desenho: desenharPizza(partes, marcasVizinhas(partes, comidas)),
-        legenda: `A pizza foi cortada em ${partes} fatias iguais. As fatias tracejadas já foram comidas.`,
+        desenho: desenharPizza(partes, marcasVizinhas(partes, comidas), sobrou ? "sobrou" : "comida"),
+        legenda: `<span>A pizza foi cortada em ${partes} fatias iguais.</span>` +
+          legendaDasCores("pizza", sobrou ? "sobrou" : "comida") +
+          `<span>Conte as fatias com <strong>contorno azul</strong>.</span>`,
         resposta: F(a, partes),
         erradas: [F(partes - a, partes), F(a, partes - a), F(partes, a), F(a + 1, partes),
           F(a - 1, partes), F(a, partes + 1), F(a, partes + 2), F(a + 1, partes + 1)],
@@ -639,8 +712,10 @@
       return {
         id: `chocolate-${total}-${comidos}-${sobrou}`,
         texto: `Que fração da barra de chocolate ${sobrou ? "<strong>sobrou</strong>" : "foi <strong>comida</strong>"}?`,
-        desenho: desenharChocolate(linhas, colunas, marcasEspalhadas(total, comidos)),
-        legenda: `A barra tem ${total} pedaços iguais. Os pedaços tracejados já foram comidos.`,
+        desenho: desenharChocolate(linhas, colunas, marcasEspalhadas(total, comidos), sobrou ? "sobrou" : "comida"),
+        legenda: `<span>A barra tem ${total} pedaços iguais.</span>` +
+          legendaDasCores("chocolate", sobrou ? "sobrou" : "comida") +
+          `<span>Conte os pedaços com <strong>contorno azul</strong>.</span>`,
         resposta: F(a, total),
         erradas: [F(total - a, total), F(a, total - a), F(total, a), F(a + 1, total),
           F(a - 1, total), F(a, total + 1), F(a, total + 2), F(a + 1, total + 1)],
@@ -695,7 +770,7 @@
         id: `soma-${partes}-${a}-${b}`,
         texto: `${nome1} comeu ${fr(a, partes)} da pizza e ${nome2} comeu ${fr(b, partes)}. Que fração da pizza os dois comeram <strong>juntos</strong>?`,
         desenho: desenharPizza(partes, marcas),
-        legenda: `${nome1[0]} = fatias de ${nome1} · ${nome2[0]} = fatias de ${nome2}`,
+        legenda: `<span>${nome1[0]} = fatias que ${nome1} comeu · ${nome2[0]} = fatias que ${nome2} comeu</span>` + legendaDasCores("pizza", null),
         resposta: F(soma, partes),
         erradas: [F(soma, partes * 2), F(partes - soma, partes), F(soma + 1, partes),
           F(soma - 1, partes), F(a * b, partes), F(soma, partes + 1)],
@@ -714,8 +789,8 @@
       return {
         id: `simplificar-${partes}-${comidas}`,
         texto: `A pizza tinha <strong>${partes} fatias</strong> e <strong>${comidas}</strong> foram comidas. Que fração foi comida, na <strong>forma mais simples</strong>?`,
-        desenho: desenharPizza(partes, marcasVizinhas(partes, comidas)),
-        legenda: `As fatias tracejadas já foram comidas.`,
+        desenho: desenharPizza(partes, marcasVizinhas(partes, comidas), "comida"),
+        legenda: `<span>A pizza foi cortada em ${partes} fatias iguais.</span>` + legendaDasCores("pizza", "comida"),
         resposta: s,
         erradas: [F(s.d - s.n, s.d), F(s.d, s.n), F(s.n + 1, s.d), F(s.n, s.d + 1),
           F(comidas, partes - comidas), F(s.n, partes), F(1, comidas)],
@@ -760,7 +835,7 @@
         texto: `${nome1} comeu ${fr(n1, d1)} da barra de chocolate e ${nome2} comeu ${fr(n2, d2)}. ` +
           (sobrou ? "Que fração da barra <strong>sobrou</strong>?" : "Que fração da barra eles comeram <strong>juntos</strong>?"),
         desenho: desenharChocolate(linhas, colunas, marcas),
-        legenda: `A barra tem ${total} pedaços iguais. ${nome1[0]} = de ${nome1} · ${nome2[0]} = de ${nome2}`,
+        legenda: `<span>A barra tem ${total} pedaços iguais.</span><span>${nome1[0]} = pedaços que ${nome1} comeu · ${nome2[0]} = pedaços que ${nome2} comeu</span>` + legendaDasCores("chocolate", null),
         resposta,
         // Erro comum: somar em cima e embaixo (1/2 + 1/3 = 2/5)
         erradas: [F(n1 + n2, d1 + d2), outra, F(resposta.n + 1, resposta.d), F(resposta.n, resposta.d + 1),
