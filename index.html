@@ -35,97 +35,9 @@
       margin-top: 0;
     }
 
-    /* ===== Pódio ===== */
-    .podio {
-      list-style: none;
-      margin: 0 auto;
-      padding: 0;
-      max-width: 46rem;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      align-items: end;
-      gap: 0.75rem;
-    }
-
-    /* 2º à esquerda, 1º no meio, 3º à direita */
-    .degrau--1 { order: 2; }
-    .degrau--2 { order: 1; }
-    .degrau--3 { order: 3; }
-
-    .degrau {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.15rem;
-      text-align: center;
-      min-width: 0;
-    }
-
-    .degrau__nick {
-      max-width: 100%;
-      font-size: clamp(1.1rem, 2.6vw, 1.5rem);
-      font-weight: 900;
-      overflow-wrap: anywhere;
-    }
-
-    .degrau__pontos {
-      color: var(--cor-linha);
-      font-weight: 800;
-    }
-
-    .degrau__jogos {
-      min-height: 1.5em;
-      font-size: 1rem;
-      color: var(--texto-claro-suave);
-    }
-
-    .degrau__bloco {
-      width: 100%;
-      margin-top: 0.5rem;
-      display: grid;
-      place-items: center;
-      background: var(--azul-noite);
-      border-top: 6px solid var(--cor-linha);
-      border-radius: var(--canto) var(--canto) 0 0;
-      box-shadow: var(--sombra);
-    }
-
-    .degrau__bloco .numero {
-      height: 3.5rem;
-      stroke-width: 12;
-    }
-
-    .degrau--1 .degrau__bloco { height: 9rem; }
-    .degrau--2 .degrau__bloco { height: 6.5rem; }
-    .degrau--3 .degrau__bloco { height: 4.75rem; }
-
-    /* Do 4º ao 10º */
-    .podio-lista {
-      max-width: 46rem;
-      margin: 1.25rem auto 0;
-      padding: 0.75rem 1.25rem 0.75rem 3rem;
-      background: var(--azul-garrafao);
-      border-radius: var(--canto);
-      box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.28);
-      color: var(--texto-claro-suave);
-    }
-
-    .podio-lista li {
-      padding: 0.3rem 0;
-    }
-
-    .podio-lista li::marker {
-      color: var(--amarelo);
-      font-weight: 800;
-    }
-
-    .podio-lista strong {
-      color: var(--texto-claro);
-    }
-
-    .podio-rodape {
-      max-width: 46rem;
-      margin: 1rem auto 0;
+    /* Aviso do ranking e botão de apagar (para a professora) */
+    .ranking-local {
+      margin: 2.5rem 0 0;
       display: flex;
       flex-wrap: wrap;
       gap: 0.75rem 1rem;
@@ -134,7 +46,7 @@
       color: var(--texto-claro-suave);
     }
 
-    .podio-rodape p {
+    .ranking-local p {
       margin: 0;
     }
 
@@ -290,19 +202,7 @@
 
   <main class="inicio">
 
-    <!-- Pódio: média dos recordes no nível Difícil (guardado só neste computador) -->
-    <section aria-labelledby="tituloPodio">
-      <h2 class="inicio__secao inicio__secao--primeira" id="tituloPodio">Pódio do Fliperama</h2>
-      <p class="inicio__dica">Média dos recordes no nível <strong>Difícil</strong>, nos jogos que cada um jogou.</p>
-      <ol class="podio" id="podio"></ol>
-      <ol class="podio-lista" id="podioLista" start="4"></ol>
-      <div class="podio-rodape">
-        <p>O ranking fica guardado só neste computador.</p>
-        <button class="botao botao--voltar" id="apagarRanking">Apagar ranking</button>
-      </div>
-    </section>
-
-    <h2 class="inicio__secao">Jogos dos grupos</h2>
+    <h2 class="inicio__secao inicio__secao--primeira">Jogos dos grupos</h2>
     <p class="inicio__dica">Cada número é um grupo. <strong>Encontre o seu e aperte Jogar!</strong></p>
 
     <!--
@@ -319,7 +219,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-01/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 1</span></a>
       </li>
@@ -332,7 +232,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-02/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 2</span></a>
       </li>
@@ -345,7 +245,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-03/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 3</span></a>
       </li>
@@ -358,7 +258,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-04/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 4</span></a>
       </li>
@@ -371,7 +271,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-05/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 5</span></a>
       </li>
@@ -384,7 +284,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-06/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 6</span></a>
       </li>
@@ -397,7 +297,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-07/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 7</span></a>
       </li>
@@ -410,7 +310,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-08/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 8</span></a>
       </li>
@@ -423,7 +323,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-09/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 9</span></a>
       </li>
@@ -436,7 +336,7 @@
         <h2 class="zona__titulo">Jogo em construção</h2>
         <dl class="zona__info">
           <div><dt>Matemática:</dt> <dd>em breve</dd></div>
-          <div><dt>Participantes:</dt> <dd>em breve</dd></div>
+          <div><dt>Integrantes:</dt> <dd>em breve</dd></div>
         </dl>
         <a class="botao zona__botao" href="jogos/grupo-10/index.html">Jogar<span class="so-leitor"> o jogo do Grupo 10</span></a>
       </li>
@@ -470,6 +370,12 @@
         <a class="botao zona__botao" href="jogos/exemplo-2/index.html">Jogar<span class="so-leitor"> o Contra o Relógio</span></a>
       </li>
     </ul>
+
+    <!-- Cada jogo tem o seu ranking, guardado só neste computador -->
+    <div class="ranking-local">
+      <p>O ranking de cada jogo fica guardado só neste computador.</p>
+      <button class="botao botao--voltar" id="apagarRanking">Apagar ranking</button>
+    </div>
   </main>
 
   <footer class="rodape">
@@ -479,65 +385,15 @@
   <!-- Ranking guardado só neste computador -->
   <script src="ranking-comum.js"></script>
   <script>
-    // ===== Pódio do Fliperama =====
-    const CORES_DO_PODIO = ["amarelo", "branco", "verde"]; // 1º, 2º e 3º lugar
-
-    function desenharPodio() {
-      const lista = Ranking.podio("dificil", 10);
-      const podio = document.getElementById("podio");
-      const resto = document.getElementById("podioLista");
-      podio.innerHTML = "";
-      resto.innerHTML = "";
-
-      // Os 3 degraus (mesmo vazios, para mostrar o pódio)
-      for (let i = 0; i < 3; i++) {
-        const aluno = lista[i];
-        const degrau = document.createElement("li");
-        degrau.className = `degrau degrau--${i + 1}`;
-        degrau.style.setProperty("--cor-linha", `var(--${CORES_DO_PODIO[i]})`);
-
-        const nome = document.createElement("span");
-        nome.className = "degrau__nick";
-        nome.textContent = aluno ? aluno.nick : "Vago";
-        const pontos = document.createElement("span");
-        pontos.className = "degrau__pontos";
-        pontos.textContent = aluno ? `${aluno.media} pontos` : "Jogue no Difícil!";
-        const jogos = document.createElement("span");
-        jogos.className = "degrau__jogos";
-        jogos.textContent = aluno ? `média de ${aluno.jogos} ${aluno.jogos === 1 ? "jogo" : "jogos"}` : "";
-
-        // Bloco do pódio com o número desenhado
-        const bloco = document.createElement("div");
-        bloco.className = "degrau__bloco";
-        bloco.innerHTML =
-          `<svg class="numero" viewBox="0 0 60 100" role="img" aria-label="${i + 1}º lugar"><use href="#d${i + 1}" width="60" height="100"/></svg>`;
-
-        degrau.append(nome, pontos, jogos, bloco);
-        podio.appendChild(degrau);
-      }
-
-      // Do 4º ao 10º lugar
-      lista.slice(3).forEach((aluno) => {
-        const item = document.createElement("li");
-        const nome = document.createElement("strong");
-        nome.textContent = aluno.nick;
-        item.append(nome, ` · ${aluno.media} pontos · média de ${aluno.jogos} ${aluno.jogos === 1 ? "jogo" : "jogos"}`);
-        resto.appendChild(item);
-      });
-      resto.hidden = lista.length <= 3;
-    }
-
     // Apagar o ranking: pede para digitar APAGAR, para ninguém apagar sem querer
     document.getElementById("apagarRanking").addEventListener("click", () => {
       const resposta = prompt("Isso apaga o ranking de TODOS os jogos neste computador. Para confirmar, digite APAGAR:");
       if (resposta && resposta.trim().toUpperCase() === "APAGAR") {
         Ranking.apagarTudo();
-        desenharPodio();
         alert("Pronto! O ranking deste computador foi apagado.");
       }
     });
 
-    desenharPodio();
   </script>
 </body>
 </html>

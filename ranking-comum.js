@@ -10,8 +10,6 @@
    - Cada jogo tem um ranking para cada nível (Fácil, Médio, Difícil).
    - Se o mesmo nome jogar de novo, fica guardado só o recorde dele
      (mais pontos; se empatar, o menor tempo).
-   - O pódio da página inicial usa o nível Difícil: é a MÉDIA dos
-     recordes de cada aluno nos jogos que ele jogou.
    ========================================================= */
 
 const Ranking = (() => {
@@ -111,29 +109,6 @@ const Ranking = (() => {
     return ordenar(registros).slice(0, quantos);
   }
 
-  // ----- Pódio geral: média dos recordes no nível Difícil -----
-  function podio(nivel = "dificil", quantos = 10) {
-    const porAluno = {};
-    for (const jogo of Object.values(ler().jogos)) {
-      const registros = jogo.niveis[nivel] || {};
-      for (const [chave, r] of Object.entries(registros)) {
-        if (!porAluno[chave]) porAluno[chave] = { nick: r.nick, recordes: [], tempo: 0 };
-        porAluno[chave].recordes.push(r.pontos);
-        porAluno[chave].tempo += r.tempo;
-      }
-    }
-    return Object.values(porAluno)
-      .map((a) => ({
-        nick: a.nick,
-        media: Math.round(a.recordes.reduce((soma, p) => soma + p, 0) / a.recordes.length),
-        jogos: a.recordes.length,
-        tempo: a.tempo,
-      }))
-      // Maior média; se empatar, quem jogou mais jogos; depois, menor tempo
-      .sort((a, b) => b.media - a.media || b.jogos - a.jogos || a.tempo - b.tempo)
-      .slice(0, quantos);
-  }
-
   function apagarTudo() {
     try {
       localStorage.removeItem(CHAVE);
@@ -184,5 +159,5 @@ const Ranking = (() => {
     elemento.appendChild(tabela);
   }
 
-  return { validarNick, salvar, top, podio, apagarTudo, formatarTempo, desenharTabela };
+  return { validarNick, salvar, top, apagarTudo, formatarTempo, desenharTabela };
 })();
